@@ -1,11 +1,9 @@
 {
   "name": "drewbot",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
-    "angular": "1.4.x",
-    "underscore": "~1.8.3",
-    "jquery": "~2.1.4",
+    "jquery": "~2.2.0",
     "jquery-ui": "~1.11.4"
   }
 }
