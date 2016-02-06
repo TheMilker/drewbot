@@ -4,6 +4,8 @@ var ngTemplates = require('gulp-ng-templates');
 var concat = require('gulp-concat');
 var jshint = require('gulp-jshint');
 var bower = require('gulp-bower');
+var nodemon = require('gulp-nodemon');
+var browserSync = require('browser-sync').create();
 
 var rootPaths =  {
     node: './node_modules/',
@@ -25,12 +27,26 @@ var paths = {
 
 var server = rootPaths.backend + 'bin/www';
 
-gulp.task('bower', function() {
+gulp.task('bower', () => {
     return bower();
 });
 
-gulp.task('lint', function() {
-    return gulp.src(['gulpfile.js', paths.frontend.src+'**/*.js', rootPaths.backend.src+'**/*.js'])
+gulp.task('lint:frontend', () => {
+    return gulp.src(paths.frontend.src +'**/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
+        .pipe(jshint.reporter('fail'));
+});
+
+gulp.task('lint:backend', () => {
+    return gulp.src(rootPaths.backend +'**/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter('default'))
+        .pipe(jshint.reporter('fail'));
+});
+
+gulp.task('lint:gulpfile', () => {
+    return gulp.src('gulpfile.js')
         .pipe(jshint())
         .pipe(jshint.reporter('default'))
         .pipe(jshint.reporter('fail'));
@@ -40,12 +56,13 @@ gulp.task('ngtemplates', () => {
     return gulp.src(paths.frontend.src+'**/*.html')
 		.pipe(ngTemplates({
 			filename: 'drewbotClient-templates.js',
-			module: 'em-drewbot'
+			module: 'em-drewbot',
+            standalone: false
         }))
 		.pipe(gulp.dest(rootPaths.frontend));
 });
 
-gulp.task('concat', ['lint', 'ngtemplates'], () => {
+gulp.task('concat', ['lint:frontend', 'ngtemplates'], () => {
     return gulp.src([
             paths.frontend.src + 'drewbotClient.js',
             paths.frontend.src + '**/*.js',
@@ -53,6 +70,39 @@ gulp.task('concat', ['lint', 'ngtemplates'], () => {
         ])
         .pipe(concat('drewbotClient.js'))
         .pipe(gulp.dest(paths.frontend.dest));
+});
+
+// run browser-sync on for client changes
+gulp.task('browser-sync', ['deploy:frontend', 'nodemon', 'watch'], () => {
+    browserSync.init(null, {
+        proxy: 'http://localhost:3000',
+        files: [rootPaths.public + '**/*.*'],
+        browser: 'google chrome',
+        port: 7000,
+    });
+});
+
+// run nodemon on server file changes
+gulp.task('nodemon', ['build'], (cb) => {
+    var started = false;
+
+    return nodemon({
+        script: server,
+        watch: [rootPaths.backend],
+        ext: 'js',
+        env: { 'NODE_ENV': 'development' }
+    }).on('start', () => {
+        if (!started) {
+            cb();
+            started = true;
+        }
+    }).on('restart', () => {
+        setTimeout(() => {
+            browserSync.reload({
+                stream: false
+            });
+        }, 500);  // browserSync reload delay
+    });
 });
 
 gulp.task('server', ['build'], (cb) => {   
@@ -77,7 +127,16 @@ gulp.task('deploy:frontendLibraries', ['bower'], () => {
     .pipe(gulp.dest(paths.frontend.lib.dest));
 });
 
-gulp.task('deploy:frontend', ['lint', 'ngtemplates', 'concat', 'deploy:frontendLibraries']);
-gulp.task('build', ['lint', 'deploy:frontend']);
+gulp.task('watch', ['lint:backend', 'deploy:frontendApp', 'ngtemplates', 'lint:gulpfile'], () => {
+    gulp.watch(rootPaths.backend + '**/*.js', ['lint:backend']); 
+    gulp.watch(paths.frontend.src + '**/*.js', ['deploy:frontendApp']);
+    gulp.watch(paths.frontend.src + '**/*.html', ['ngtemplates']);
+    gulp.watch('gulpfile.js', ['lint:gulpfile']);
+}); 
 
+gulp.task('deploy:frontendApp', ['lint:frontend', 'concat']);
+gulp.task('deploy:frontend', ['deploy:frontendApp', 'deploy:frontendLibraries']);
+gulp.task('build', ['lint:backend', 'deploy:frontend']);
+
+gulp.task('dev', ['build', 'watch', 'browser-sync']);
 gulp.task('default', ['server']);

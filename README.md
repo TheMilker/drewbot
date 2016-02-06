@@ -1,15 +1,11 @@
 # drewbot
 #installation instructions
 1. npm install
-3. enter your admin password
-4. grunt compile
-5. npm start
-6. http://localhost:3000/
-
+2. gulp build
+3. gulp
+4. http://localhost:3000/
 
 #development instructions
 1. npm install
-3. enter your admin password
-4. grunt compile
-5. grunt start
-6. http://localhost:3000/
+2. gulp dev
+3. http://localhost:7000/
