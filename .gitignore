@@ -1,10 +1,11 @@
 bower_components
-lib
 node_modules
 public/javascripts/**
+public/lib/**
 frontend/drewbotClient-templates.js
 pkgscript.log
 npm-debug.log
 /.DS_Store
 .vscode/launch.json
 .vscode/settings.json
+typings
