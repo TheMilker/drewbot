@@ -1,7 +1,7 @@
 {
   "name": "drewbot",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "start": "node ./backend/bin/www"
   },
@@ -23,8 +23,11 @@
     "serialport": "^2.0.6"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.3.13",
     "browser-sync": "^2.11.1",
+    "del": "^2.2.0",
     "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
     "gulp-bower": "0.0.13",
     "gulp-concat": "^2.6.0",
     "gulp-jshint": "^2.0.0",

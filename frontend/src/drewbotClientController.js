@@ -6,26 +6,20 @@ angular.module('em-drewbot').controller('DrewbotClientController', ['$http',
             customCommand: ""
         };
 
-        this.left90 = function() {
-            sendCommand("l90\n");
-        };
+        this.left90 = () => sendCommand("l90\n");
 
-        this.right90 = function() {
-            sendCommand("r90\n");
-        };
+        this.right90 = () => sendCommand("r90\n");
 
-        this.lifter90 = function() {
-            sendCommand("i90\n");
-        };
+        this.lifter90 = () => sendCommand("i90\n");
 
-        this.sendCustomCommand = function() {
+        this.sendCustomCommand = () => {
             if(!endsWith(self.model.customCommand, "\n")) {
                 self.model.customCommand = self.model.customCommand+"\n";
             }
             sendCommand(self.model.customCommand);
         };
 
-        this.connectArduino = function() {
+        this.connectArduino = () => {
             $http.post('/connectArduino').success(function(data, status, headers, config) {
                 self.model.commandResponse = data;
             }).error(function(data, status, headers, config) {

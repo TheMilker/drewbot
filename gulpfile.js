@@ -1,13 +1,15 @@
-var gulp = require('gulp');
-var spawn = require('child_process').spawn;
-var ngTemplates = require('gulp-ng-templates');
-var concat = require('gulp-concat');
-var jshint = require('gulp-jshint');
-var bower = require('gulp-bower');
-var nodemon = require('gulp-nodemon');
-var browserSync = require('browser-sync').create();
+const gulp = require('gulp');
+const spawn = require('child_process').spawn;
+const ngTemplates = require('gulp-ng-templates');
+const concat = require('gulp-concat');
+const jshint = require('gulp-jshint');
+const bower = require('gulp-bower');
+const nodemon = require('gulp-nodemon');
+const browserSync = require('browser-sync').create();
+const babel = require('gulp-babel');
+const del = require('del');
 
-var rootPaths =  {
+const rootPaths =  {
     node: './node_modules/',
     frontend: './frontend/',
     backend: './backend/',
@@ -15,7 +17,7 @@ var rootPaths =  {
     bower: './bower_components/'
 };
 
-var paths = {
+const paths = {
     frontend: {
         src: rootPaths.frontend + 'src/',
         dest: rootPaths.public + 'javascripts/',
@@ -25,7 +27,7 @@ var paths = {
     }   
 };
 
-var server = rootPaths.backend + 'bin/www';
+const server = rootPaths.backend + 'bin/www';
 
 gulp.task('bower', () => {
     return bower();
@@ -62,12 +64,14 @@ gulp.task('ngtemplates', () => {
 		.pipe(gulp.dest(rootPaths.frontend));
 });
 
-gulp.task('concat', ['lint:frontend', 'ngtemplates'], () => {
+gulp.task('compile:frontendApp', ['lint:frontend', 'ngtemplates'], () => {
     return gulp.src([
             paths.frontend.src + 'drewbotClient.js',
             paths.frontend.src + '**/*.js',
             rootPaths.frontend + 'drewbotClient-templates.js'            
-        ])
+        ]).pipe(babel({
+			presets: ['es2015']
+		}))
         .pipe(concat('drewbotClient.js'))
         .pipe(gulp.dest(paths.frontend.dest));
 });
@@ -132,9 +136,15 @@ gulp.task('watch', ['lint:backend', 'deploy:frontendApp', 'ngtemplates', 'lint:g
     gulp.watch(paths.frontend.src + '**/*.js', ['deploy:frontendApp']);
     gulp.watch(paths.frontend.src + '**/*.html', ['ngtemplates']);
     gulp.watch('gulpfile.js', ['lint:gulpfile']);
-}); 
+});
 
-gulp.task('deploy:frontendApp', ['lint:frontend', 'concat']);
+gulp.task('clean', () => {
+    del([rootPaths.frontend + 'drewbotClient-templates.js', '!'+paths.frontend.dest, paths.frontend.dest+'**'], {dryRun: false}).then(paths => {
+	   console.log('Files and folders that were deleted:\n', paths.join('\n'));
+    });
+});
+
+gulp.task('deploy:frontendApp', ['lint:frontend', 'compile:frontendApp']);
 gulp.task('deploy:frontend', ['deploy:frontendApp', 'deploy:frontendLibraries']);
 gulp.task('build', ['lint:backend', 'deploy:frontend']);
 
