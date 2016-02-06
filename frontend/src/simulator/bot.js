@@ -152,8 +152,7 @@ angular.module('em-drewbot').factory('bot', ['botEngine', 'simulatorConstants', 
 
          var stroke = playbackStrokes[playbackIndex++];
          strokePoints.push(stroke);
-
-         //debugger; //jshint ignore:line
+         
          globalLeftAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getLeftBaseArm(globalLeftAngle), true);
          globalRightAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getRightBaseArm(globalRightAngle), false);
 

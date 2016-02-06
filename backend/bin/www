@@ -7,7 +7,6 @@
 var app = require('../app');
 var debug = require('debug')('drewbot:server');
 var http = require('http');
-var serialPort = require('serialport');
 
 /**
  * Get port from environment and store in Express.
