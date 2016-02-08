@@ -1,4 +1,5 @@
-"use strict"; // jshint ignore:line
+/* global sqrt */
+/* global ARMLENGTH */
 var DEBUG = false;
 
 function Stroke(x, y, draw) {

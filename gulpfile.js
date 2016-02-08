@@ -66,7 +66,7 @@ gulp.task('ngtemplates', () => {
 
 gulp.task('compile:frontendApp', ['lint:frontend', 'ngtemplates'], () => {
     return gulp.src([
-            paths.frontend.src + 'drewbotClient.js',
+            paths.frontend.src + 'drewbotClient.module.js',
             paths.frontend.src + '**/*.js',
             rootPaths.frontend + 'drewbotClient-templates.js'            
         ]).pipe(babel({

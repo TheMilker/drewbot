@@ -1,5 +1,3 @@
-/// <reference path="../../../typings/angularjs/angular.d.ts"/>
-/// <reference path="../../../typings/underscore/underscore.d.ts"/>
 angular.module('em-drewbot').factory('sanitizationService', ['bot', 'botEngine', 
     function(bot, botEngine) {
         
