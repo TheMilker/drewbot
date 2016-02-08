@@ -29,7 +29,6 @@
     "del": "^2.2.0",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.2",
-    "gulp-bower": "0.0.13",
     "gulp-concat": "^2.6.0",
     "gulp-jshint": "^2.0.0",
     "gulp-ng-templates": "0.0.6",

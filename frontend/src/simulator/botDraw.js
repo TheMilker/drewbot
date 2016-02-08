@@ -1,10 +1,17 @@
-/// <reference path="../../../typings/angularjs/angular.d.ts"/>
 angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
     function(simulatorDataService) {
 
         var instance = {};
 
         var simulatorModel = simulatorDataService.getSimulatorModel();
+        
+        function getCanvasElement() {
+            return document.getElementById("drewbotCanvas");
+        }
+        
+        instance.getContext = function() {
+            return getCanvasElement().getContext("2d");
+        };
 
         instance.addOutputText = function(str) {
             simulatorModel.commands = simulatorModel.commands + str + '\n';
@@ -16,10 +23,6 @@ angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
             var canvasContext = instance.getContext();
             var canvasElement = getCanvasElement();
             canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
-        };
-
-        instance.getContext = function() {
-            return getCanvasElement().getContext("2d");
         };
 
         instance.drawCharOutline = function(basePoint, width, length) {
@@ -93,11 +96,7 @@ angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
             canvasContext.lineWidth = 10;
             canvasContext.stroke();
             canvasContext.closePath();
-        };
-
-        function getCanvasElement() {
-            return document.getElementById("canvas");
-        }
+        };        
 
         function drawGeneralLine(startPos, endPos, color, width) {
             var canvasContext = instance.getContext();

@@ -3,7 +3,6 @@ const spawn = require('child_process').spawn;
 const ngTemplates = require('gulp-ng-templates');
 const concat = require('gulp-concat');
 const jshint = require('gulp-jshint');
-const bower = require('gulp-bower');
 const nodemon = require('gulp-nodemon');
 const browserSync = require('browser-sync').create();
 const babel = require('gulp-babel');
@@ -13,8 +12,7 @@ const rootPaths =  {
     node: './node_modules/',
     frontend: './frontend/',
     backend: './backend/',
-    public: './public/',
-    bower: './bower_components/'
+    public: './public/'
 };
 
 const paths = {
@@ -28,10 +26,6 @@ const paths = {
 };
 
 const server = rootPaths.backend + 'bin/www';
-
-gulp.task('bower', () => {
-    return bower();
-});
 
 gulp.task('lint:frontend', () => {
     return gulp.src(paths.frontend.src +'**/*.js')
@@ -119,22 +113,20 @@ gulp.task('server', ['build'], (cb) => {
     });    
 });
 
-gulp.task('deploy:frontendLibraries', ['bower'], () => {
+gulp.task('deploy:frontendLibraries', () => {
     return gulp.src([
         rootPaths.node + 'angular/angular.js',
         rootPaths.node + 'angular/angular.min.js',
         rootPaths.node + 'angular/angular.min.js.map',
-        rootPaths.node + 'underscore/underscore.js',
-        rootPaths.bower + 'jquery/dist/jquery.js',
-        rootPaths.bower + 'jquery-ui/jquery-ui.js'
+        rootPaths.node + 'underscore/underscore.js'
     ])
     .pipe(gulp.dest(paths.frontend.lib.dest));
 });
 
-gulp.task('watch', ['lint:backend', 'deploy:frontendApp', 'ngtemplates', 'lint:gulpfile'], () => {
+gulp.task('watch', ['lint:backend', 'deploy:frontendApp', 'lint:gulpfile'], () => {
     gulp.watch(rootPaths.backend + '**/*.js', ['lint:backend']); 
     gulp.watch(paths.frontend.src + '**/*.js', ['deploy:frontendApp']);
-    gulp.watch(paths.frontend.src + '**/*.html', ['ngtemplates']);
+    gulp.watch(paths.frontend.src + '**/*.html', ['deploy:frontendApp']);
     gulp.watch('gulpfile.js', ['lint:gulpfile']);
 });
 

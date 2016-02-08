@@ -1,9 +1,0 @@
-{
-  "name": "drewbot",
-  "version": "0.1.0",
-  "private": false,
-  "dependencies": {
-    "jquery": "~2.2.0",
-    "jquery-ui": "~1.11.4"
-  }
-}

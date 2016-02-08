@@ -5,228 +5,223 @@
 /* global addOutputPositionText */
 /* global Point */
 
-angular.module('em-drewbot').factory('bot', ['botEngine', 'simulatorConstants', 'botDraw', 'botDigitalClock', 'botCharGenerator', 'simulatorDataService',
-   function(botEngine, simulatorConstants, botDraw, botDigitalClock, botCharGenerator, simulatorDataService) {
+angular.module('em-drewbot').factory('bot', bot);
 
-      var instance = {};
+bot.$inject = ['botEngine', 'simulatorConstants', 'botDraw', 'botDigitalClock', 'botCharGenerator'];
 
-      var globalLeftAngle = new Angle(125, true);
-      var globalRightAngle = new Angle(75, true);
+function bot(botEngine, simulatorConstants, botDraw, botDigitalClock, botCharGenerator) {
+    
+    var instance = {};
 
-      var backgroundImg = new Image();
-      backgroundImg.src = "/images/paper.jpg";
+    var globalLeftAngle = new Angle(125, true);
+    var globalRightAngle = new Angle(75, true);   
 
-      var strokePoints = [];
+    var strokePoints = [];
 
-      var playbackStrokes = [];
-      var playbackIndex;
+    var playbackStrokes = [];
+    var playbackIndex;
 
-      instance.moveToMousePos = function moveToMousePos(canvas, evt, mouseDown) {
-         var rect = canvas.getBoundingClientRect();
-         var stroke = new Stroke(
-            evt.clientX - rect.left,
-            evt.clientY - rect.top,
-            mouseDown);
-         moveToPos(stroke, evt.shiftKey);
-      };
+    instance.moveToMousePos = function moveToMousePos(canvas, evt, mouseDown) {
+        var rect = canvas.getBoundingClientRect();
+        var stroke = new Stroke(
+        evt.clientX - rect.left,
+        evt.clientY - rect.top,
+        mouseDown);
+        moveToPos(stroke, evt.shiftKey);
+    };
 
-      instance.clearStrokePoints = function() {
-         strokePoints = [];
-      };
+    instance.clearStrokePoints = function() {
+        strokePoints = [];
+    };
 
-      instance.update = function() {
+    instance.update = function() {
 
-         botDraw.clearCanvas();
+        botDraw.clearCanvas();
 
-         var leftBaseArm = instance.getLeftBaseArm(globalLeftAngle);
-         var rightBaseArm = instance.getRightBaseArm(globalRightAngle);
+        var leftBaseArm = instance.getLeftBaseArm(globalLeftAngle);
+        var rightBaseArm = instance.getRightBaseArm(globalRightAngle);
 
-         draw(leftBaseArm, rightBaseArm);
-      };
+        draw(leftBaseArm, rightBaseArm);
+    };
 
-        function moveToPos(stroke, shitKeyDown) {
-            var tempLeftAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getLeftBaseArm(globalLeftAngle), true);
-            var tempRightAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getRightBaseArm(globalRightAngle), false);
+    function moveToPos(stroke, shitKeyDown) {
+        var tempLeftAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getLeftBaseArm(globalLeftAngle), true);
+        var tempRightAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getRightBaseArm(globalRightAngle), false);
 
-            if(shitKeyDown || (!shitKeyDown && stroke.draw)) {
-                if (!isNaN(tempLeftAngle.degrees) && !isNaN(tempRightAngle.degrees)) {
-                    updatePosition(stroke);
-                    strokePoints.push(stroke);
-                    botDraw.drawCircle(stroke.point, 15);
-                } else {
-                    instance.update();
-                }
+        if(shitKeyDown || (!shitKeyDown && stroke.draw)) {
+            if (!isNaN(tempLeftAngle.degrees) && !isNaN(tempRightAngle.degrees)) {
+                updatePosition(stroke);
+                strokePoints.push(stroke);
+                botDraw.drawCircle(stroke.point, 15);
             } else {
                 instance.update();
             }
-            botDraw.addTextAtPosition("  (" + stroke.point.x + "," + stroke.point.y + ")", stroke.point);
-        }
-
-        function updatePosition(positionStroke) {
-
-            var positionPoint = positionStroke.point;
-
-            if (isNaN(positionPoint.x) || isNaN(positionPoint.y)) {
-                return;
-            }
-
-            globalLeftAngle = botEngine.determineBaseAngleFromPosition(positionPoint, instance.getLeftBaseArm(globalLeftAngle), true);
-            globalRightAngle = botEngine.determineBaseAngleFromPosition(positionPoint, instance.getRightBaseArm(globalRightAngle), false);
-
-            addOutputAngleText(globalLeftAngle, globalRightAngle);
-            botDraw.addOutputPositionText(positionStroke);
-
+        } else {
             instance.update();
         }
+        botDraw.addTextAtPosition("  (" + stroke.point.x + "," + stroke.point.y + ")", stroke.point);
+    }
 
-      function addOutputAngleText(leftAngle, rightAngle) {
-         botDraw.addOutputText("L" + (180 - Math.floor(leftAngle.degrees)));
-         botDraw.addOutputText("R" + (180 - Math.floor(rightAngle.degrees)));
-      }
+    function updatePosition(positionStroke) {
 
-      function servoEndPoint(arm) {
+        var positionPoint = positionStroke.point;
 
-         var x = Math.cos(arm.angle.radians) * arm.length + arm.point.x;
-         var y = Math.sin(arm.angle.radians) * arm.length + arm.point.y;
+        if (isNaN(positionPoint.x) || isNaN(positionPoint.y)) {
+            return;
+        }
 
-         return new Point(x, y);
-      }
+        globalLeftAngle = botEngine.determineBaseAngleFromPosition(positionPoint, instance.getLeftBaseArm(globalLeftAngle), true);
+        globalRightAngle = botEngine.determineBaseAngleFromPosition(positionPoint, instance.getRightBaseArm(globalRightAngle), false);
 
-      function positionOfConnection(point1, p1Length, point2, p2Length) {
+        addOutputAngleText(globalLeftAngle, globalRightAngle);
+        botDraw.addOutputPositionText(positionStroke);
 
-         var intersectionPoints = botEngine.circleIntersectionPoints(point1, p1Length, point2, p2Length);
-         var connectionPoint;
+        instance.update();
+    }
 
-         // Use max y - it should never buckle down
+    function addOutputAngleText(leftAngle, rightAngle) {
+        botDraw.addOutputText("L" + (180 - Math.floor(leftAngle.degrees)));
+        botDraw.addOutputText("R" + (180 - Math.floor(rightAngle.degrees)));
+    }
 
-         if (intersectionPoints[1].y > intersectionPoints[0].y) {
-            connectionPoint = intersectionPoints[1];
-         } else {
-            connectionPoint = intersectionPoints[0];
-         }
+    function servoEndPoint(arm) {
 
-         return connectionPoint;
-      }
+        var x = Math.cos(arm.angle.radians) * arm.length + arm.point.x;
+        var y = Math.sin(arm.angle.radians) * arm.length + arm.point.y;
 
-      function draw(baseLeft, baseRight) {
+        return new Point(x, y);
+    }
 
-         // Add background image to canvas
-         botDraw.getContext().drawImage(backgroundImg, 0, -120);
+    function positionOfConnection(point1, p1Length, point2, p2Length) {
 
-         // Add box for char size
-         botDraw.drawCharOutline({ "x": baseLeft.point.x, "y": simulatorConstants.ARMLENGTH * 0.9 }, simulatorConstants.ARMLENGTH * 0.5, simulatorConstants.ARMLENGTH * 0.5);
+        var intersectionPoints = botEngine.circleIntersectionPoints(point1, p1Length, point2, p2Length);
+        var connectionPoint;
 
-         var leftEndPoint = servoEndPoint(baseLeft);
-         var rightEndPoint = servoEndPoint(baseRight);
+        // Use max y - it should never buckle down
 
-         // Draw the base arms
-         botDraw.drawLine(baseLeft.point, leftEndPoint, "#111111");
-         botDraw.drawLine(baseRight.point, rightEndPoint, "#00ff00");
+        if (intersectionPoints[1].y > intersectionPoints[0].y) {
+        connectionPoint = intersectionPoints[1];
+        } else {
+        connectionPoint = intersectionPoints[0];
+        }
 
-         // Determine where connection, and draw top arms.
-         var connectionPoint = positionOfConnection(leftEndPoint, baseLeft.length, rightEndPoint, baseRight.length);
+        return connectionPoint;
+    }
 
-         botDraw.drawLine(leftEndPoint, connectionPoint, "#0000ff");
-         botDraw.drawLine(rightEndPoint, connectionPoint, "#ff0000");
+    function draw(baseLeft, baseRight) {       
 
-         // If we're in drawing mode, draw the current set of points
-         botDraw.applyStrokes(strokePoints);
+        // Add box for char size
+        botDraw.drawCharOutline({ "x": baseLeft.point.x, "y": simulatorConstants.ARMLENGTH * 0.9 }, simulatorConstants.ARMLENGTH * 0.5, simulatorConstants.ARMLENGTH * 0.5);
 
-         // Add some text to help with debugging
-         botDraw.addTextAtPosition("  (" + Math.floor(connectionPoint.x) + "," + Math.floor(connectionPoint.y) + ")", connectionPoint);
-         botDraw.addTextAtPosition("  Left(" + Math.floor(baseLeft.angle.degrees) + "\u00B0)", baseLeft.point);
-         botDraw.addTextAtPosition("  Right(" + Math.floor(baseRight.angle.degrees) + "\u00B0)", baseRight.point);
-      }
+        var leftEndPoint = servoEndPoint(baseLeft);
+        var rightEndPoint = servoEndPoint(baseRight);
 
-      instance.getLeftBaseArm = function(angle) {
-         var arm = new Arm(simulatorConstants.ARMLENGTH * 2, 0, angle, simulatorConstants.ARMLENGTH);
-         return arm;
-      };
+        // Draw the base arms
+        botDraw.drawLine(baseLeft.point, leftEndPoint, "#111111");
+        botDraw.drawLine(baseRight.point, rightEndPoint, "#00ff00");
 
-      instance.getRightBaseArm = function(angle) {
-         var arm = new Arm(simulatorConstants.ARMLENGTH * 2 + 4 * 20, 0, angle, simulatorConstants.ARMLENGTH);
-         return arm;
-      };
+        // Determine where connection, and draw top arms.
+        var connectionPoint = positionOfConnection(leftEndPoint, baseLeft.length, rightEndPoint, baseRight.length);
 
-      function onePlaybackStep() {
+        botDraw.drawLine(leftEndPoint, connectionPoint, "#0000ff");
+        botDraw.drawLine(rightEndPoint, connectionPoint, "#ff0000");
 
-         var stroke = playbackStrokes[playbackIndex++];
-         strokePoints.push(stroke);
-         
-         globalLeftAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getLeftBaseArm(globalLeftAngle), true);
-         globalRightAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getRightBaseArm(globalRightAngle), false);
+        // If we're in drawing mode, draw the current set of points
+        botDraw.applyStrokes(strokePoints);
 
-         var leftBaseArm = instance.getLeftBaseArm(globalLeftAngle);
-         var rightBaseArm = instance.getRightBaseArm(globalRightAngle);
+        // Add some text to help with debugging
+        botDraw.addTextAtPosition("  (" + Math.floor(connectionPoint.x) + "," + Math.floor(connectionPoint.y) + ")", connectionPoint);
+        botDraw.addTextAtPosition("  Left(" + Math.floor(baseLeft.angle.degrees) + "\u00B0)", baseLeft.point);
+        botDraw.addTextAtPosition("  Right(" + Math.floor(baseRight.angle.degrees) + "\u00B0)", baseRight.point);
+    }
 
-         var leftEndPoint = servoEndPoint(leftBaseArm);
-         var rightEndPoint = servoEndPoint(rightBaseArm);
+    instance.getLeftBaseArm = function(angle) {
+        var arm = new Arm(simulatorConstants.ARMLENGTH * 2, 0, angle, simulatorConstants.ARMLENGTH);
+        return arm;
+    };
 
-         botDraw.clearCanvas();
+    instance.getRightBaseArm = function(angle) {
+        var arm = new Arm(simulatorConstants.ARMLENGTH * 2 + 4 * 20, 0, angle, simulatorConstants.ARMLENGTH);
+        return arm;
+    };
 
-         // Draw the base arms
-         botDraw.drawLine(leftBaseArm.point, leftEndPoint, "#111111");
-         botDraw.drawLine(rightBaseArm.point, rightEndPoint, "#00ff00");
+    function onePlaybackStep() {
 
-         // Determine where connection, and draw top arms.
-         var connectionPoint = positionOfConnection(leftEndPoint, leftBaseArm.length, rightEndPoint, rightBaseArm.length);
+        var stroke = playbackStrokes[playbackIndex++];
+        strokePoints.push(stroke);
+        
+        globalLeftAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getLeftBaseArm(globalLeftAngle), true);
+        globalRightAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getRightBaseArm(globalRightAngle), false);
 
-         botDraw.drawLine(leftEndPoint, connectionPoint, "#0000ff");
-         botDraw.drawLine(rightEndPoint, connectionPoint, "#ff0000");
+        var leftBaseArm = instance.getLeftBaseArm(globalLeftAngle);
+        var rightBaseArm = instance.getRightBaseArm(globalRightAngle);
 
-         botDraw.addTextAtPosition("  (" + Math.floor(connectionPoint.x) + "," + Math.floor(connectionPoint.y) + ")", stroke.point);
+        var leftEndPoint = servoEndPoint(leftBaseArm);
+        var rightEndPoint = servoEndPoint(rightBaseArm);
 
-         if(stroke.draw) {
+        botDraw.clearCanvas();
+
+        // Draw the base arms
+        botDraw.drawLine(leftBaseArm.point, leftEndPoint, "#111111");
+        botDraw.drawLine(rightBaseArm.point, rightEndPoint, "#00ff00");
+
+        // Determine where connection, and draw top arms.
+        var connectionPoint = positionOfConnection(leftEndPoint, leftBaseArm.length, rightEndPoint, rightBaseArm.length);
+
+        botDraw.drawLine(leftEndPoint, connectionPoint, "#0000ff");
+        botDraw.drawLine(rightEndPoint, connectionPoint, "#ff0000");
+
+        botDraw.addTextAtPosition("  (" + Math.floor(connectionPoint.x) + "," + Math.floor(connectionPoint.y) + ")", stroke.point);
+
+        if(stroke.draw) {
             botDraw.addOutputText("i102");
-         } else {
+        } else {
             botDraw.addOutputText("i90");
-         }
+        }
 
-         addOutputAngleText(globalLeftAngle, globalRightAngle);
+        addOutputAngleText(globalLeftAngle, globalRightAngle);
 
-         botDraw.applyStrokes(strokePoints);
+        botDraw.applyStrokes(strokePoints);
 
-         if (playbackIndex < playbackStrokes.length) {
+        if (playbackIndex < playbackStrokes.length) {
             setTimeout(onePlaybackStep, 100); // jshint ignore:line
-         }
-      }
+        }
+    }
 
-      instance.playback = function() {
+    instance.playback = function() {
 
-         var json = '{ "data": [' + document.getElementById("outputPosition").value + "0]}";
-         var points = JSON.parse(json);
+        var json = '{ "data": [' + document.getElementById("outputPosition").value + "0]}";
+        var points = JSON.parse(json);
 
-         for (var i = 0; i<points.data.length;i++) {
-            playbackStrokes.push( new Stroke(points.data[i].x, points.data[i].y, true));
-         }
+        for (var i = 0; i<points.data.length;i++) {
+        playbackStrokes.push( new Stroke(points.data[i].x, points.data[i].y, true));
+        }
 
-         strokePoints = [];
-         playbackIndex = 0;
+        strokePoints = [];
+        playbackIndex = 0;
 
-         onePlaybackStep();
-      };
+        onePlaybackStep();
+    };
 
-      instance.whatTimeIsIt = function() {
+    instance.whatTimeIsIt = function() {
 
-         playbackStrokes = botDigitalClock.getTimeAsStrokes();
-         strokePoints = []; // reset
-         playbackStrokes.push(new Stroke(310,190,false));
-         playbackIndex = 0;
+        playbackStrokes = botDigitalClock.getTimeAsStrokes();
+        strokePoints = []; // reset
+        playbackStrokes.push(new Stroke(310,190,false));
+        playbackIndex = 0;
 
-         onePlaybackStep();
-      };
+        onePlaybackStep();
+    };
 
-      instance.doMessage = function() {
+    instance.doMessage = function() {
 
-         playbackStrokes = botCharGenerator.convertToStrokes(document.getElementById("message").value);
-         strokePoints = []; // reset
-         playbackStrokes.push( new Stroke(310,190,false));
-         playbackIndex = 0;
+        playbackStrokes = botCharGenerator.convertToStrokes(document.getElementById("message").value);
+        strokePoints = []; // reset
+        playbackStrokes.push( new Stroke(310,190,false));
+        playbackIndex = 0;
 
-         onePlaybackStep();
-      };
+        onePlaybackStep();
+    };
 
-      return instance;
-
-   }]
-);
+    return instance;
+}

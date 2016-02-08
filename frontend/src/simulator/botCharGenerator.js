@@ -1,3 +1,4 @@
+/* global handFont */
 angular.module('em-drewbot').factory('botCharGenerator', ['simulatorConstants', 
    function(simulatorConstants) {
       
