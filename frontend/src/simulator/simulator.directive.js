@@ -1,6 +1,5 @@
 (function() {
     'use strict';
-
     angular.module('em-drewbot').directive('emSimulator', emSimulator);
 
     function emSimulator() {

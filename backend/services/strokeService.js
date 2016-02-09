@@ -34,10 +34,6 @@ function getCommand(stroke, lastStroke) {
     return commands;
 }
 
-function removeExtraDownCommands(commands) {
-
-}
-
 function determineBaseAngleFromPosition(strokePoint, baseArm, isLeft) {
 
     var points = circleIntersectionPoints(baseArm.point, baseArm.length, strokePoint, ARM_LENGTH);

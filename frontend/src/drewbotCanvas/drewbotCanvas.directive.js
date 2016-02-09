@@ -1,39 +1,42 @@
-angular.module('em-drewbot').directive('emDrewbotCanvas', emDrewbotCanvas);
+(function() {
+    'use strict';    
+    angular.module('em-drewbot').directive('emDrewbotCanvas', emDrewbotCanvas);
 
-emDrewbotCanvas.$inject = ['bot', 'botDraw', 'simulatorDataService'];
+    emDrewbotCanvas.$inject = ['bot', 'simulatorDataService', 'drewbotCanvas'];
 
-function emDrewbotCanvas(bot, botDraw, simulatorDataService) {
-    var directive = {
-        scope: {},
-        templateUrl: 'drewbotCanvas/drewbotCanvas.html',
-        replace: true,
-        link: link,
-        restrict: 'E',
-    };
-    return directive;
-    
-    function link($scope, canvasElement, attrs) {
-                
-        var mouseDown = false;
-        canvasElement.on('mousemove', (event) => {
-            simulatorDataService.getSimulatorModel().isRecording = event.shiftKey;
-            bot.moveToMousePos(canvasElement[0], event, mouseDown);
-            $scope.$apply();
-        });
-
-        canvasElement.on('mousedown', (event) => {
-            if(!event.shiftKey) {
-                simulatorDataService.clearStrokesAndCommands();
-                bot.clearStrokePoints();
+    function emDrewbotCanvas(bot, simulatorDataService, drewbotCanvas) {
+        var directive = {
+            scope: {},
+            templateUrl: 'drewbotCanvas/drewbotCanvas.html',
+            replace: true,
+            link: link,
+            restrict: 'E',
+        };
+        return directive;
+        
+        function link($scope, canvasElement, attrs) {
+            drewbotCanvas.set(canvasElement);
+            var mouseDown = false;
+            canvasElement.on('mousemove', (event) => {
+                simulatorDataService.getSimulatorModel().isRecording = event.shiftKey;
+                bot.moveToMousePos(canvasElement[0], event, mouseDown);
                 $scope.$apply();
-            }
-            mouseDown = true;
-        });
+            });
 
-        canvasElement.on('mouseup', (event) => {
-            mouseDown = false;
-        });
+            canvasElement.on('mousedown', (event) => {
+                if(!event.shiftKey) {
+                    simulatorDataService.clearStrokesAndCommands();
+                    bot.clearStrokePoints();
+                    $scope.$apply();
+                }
+                mouseDown = true;
+            });
 
-        bot.update();
+            canvasElement.on('mouseup', (event) => {
+                mouseDown = false;
+            });
+
+            bot.update();
+        }
     }
-}
+})();

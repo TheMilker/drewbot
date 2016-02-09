@@ -1,5 +1,10 @@
-angular.module('em-drewbot').factory('sanitizationService', ['bot', 'botEngine', 
-    function(bot, botEngine) {
+(function() {
+    'use strict'; 
+    angular.module('em-drewbot').factory('sanitizationService', sanitizationService);
+    
+    sanitizationService.$inject = ['bot', 'botEngine'];
+    
+    function sanitizationService(bot, botEngine) {
         
         var globalLeftAngle = new Angle(125, true);
         var globalRightAngle = new Angle(75, true);
@@ -65,5 +70,5 @@ angular.module('em-drewbot').factory('sanitizationService', ['bot', 'botEngine',
         }
 
         return instance;
-    }]
-);
+    }
+})();

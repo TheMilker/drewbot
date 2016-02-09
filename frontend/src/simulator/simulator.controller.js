@@ -1,5 +1,10 @@
-angular.module('em-drewbot').controller('SimulatorController', ['$http', 'bot', 'simulatorDataService', 'sanitizationService',
-    function($http, bot, simulatorDataService, sanitizationService) {
+(function() {
+    'use strict'; 
+    angular.module('em-drewbot').controller('SimulatorController', SimulatorController);
+    
+    SimulatorController.$inject = ['$http', 'bot', 'simulatorDataService', 'sanitizationService'];
+    
+    function SimulatorController($http, bot, simulatorDataService, sanitizationService) {
         var simulatorVM = this;
         
         simulatorVM.simulatorModel = simulatorDataService.getSimulatorModel();
@@ -7,14 +12,10 @@ angular.module('em-drewbot').controller('SimulatorController', ['$http', 'bot', 
         simulatorVM.clearStrokes = simulatorDataService.clearStrokes;
         simulatorVM.clearFontStrokes = simulatorDataService.clearFontStrokes;
 
-        simulatorVM.getCommandCount = () => {
-            return simulatorVM.simulatorModel.commands.split("\n").length - 1;
-        };
-
         simulatorVM.sendCommands = () => {
             var commandsArray = simulatorVM.simulatorModel.commands.trim().split("\n");
 
-            console.log("commands: ", commandsArray);
+            console.log("sending commands: ", commandsArray);
 
             $http.post('/commands', {commands: commandsArray}).success((data, status, headers, config) => {
                 simulatorVM.simulatorModel.response = data;
@@ -24,27 +25,17 @@ angular.module('em-drewbot').controller('SimulatorController', ['$http', 'bot', 
         };
 
         simulatorVM.sendStrokes = () => {
-            if(endsWith(simulatorVM.simulatorModel.strokes, ",")) {
-                simulatorVM.simulatorModel.strokes = simulatorVM.simulatorModel.strokes.substring(0, simulatorVM.simulatorModel.strokes.length - 1);
-            }
-            var JSONStrokes = JSON.parse("[" + simulatorVM.simulatorModel.strokes + "]");
-
+            var JSONStrokes = simulatorDataService.getStrokesAsJSONArray();
+            console.log("Recorded Strokes: ", JSONStrokes);
             $http.post('/drawStrokes', {strokes: JSONStrokes}).success((data, status, headers, config) => {
                 simulatorVM.simulatorModel.response = data;
             }).error((data, status, headers, config) => {
                 simulatorVM.simulatorModel.response = data;
             });
         };
-
-        function endsWith(str, suffix) {
-            return str.indexOf(suffix, str.length - suffix.length) !== -1;
-        }
         
         simulatorVM.makeFont = () => {
-            if(endsWith(simulatorVM.simulatorModel.strokes, ",")) {
-                simulatorVM.simulatorModel.strokes = simulatorVM.simulatorModel.strokes.substring(0, simulatorVM.simulatorModel.strokes.length - 1);
-            }
-            var JSONStrokes = JSON.parse("[" + simulatorVM.simulatorModel.strokes + "]");
+            var JSONStrokes = simulatorDataService.getStrokesAsJSONArray();
             JSONStrokes = sanitizationService.removeDuplicateStrokes(JSONStrokes);
             JSONStrokes = sanitizationService.removeExtraUpStokes(JSONStrokes);
             simulatorVM.simulatorModel.fontStrokes = JSON.stringify(JSONStrokes);
@@ -52,7 +43,7 @@ angular.module('em-drewbot').controller('SimulatorController', ['$http', 'bot', 
         
         simulatorVM.sendFont = () => {
             var JSONStrokes = JSON.parse(simulatorVM.simulatorModel.fontStrokes);
-            console.log("JSONStrokes: ", JSONStrokes);
+            console.log("Font Strokes: ", JSONStrokes);
             $http.post('/drawStrokes', {strokes: JSONStrokes}).success((data, status, headers, config) => {
                 simulatorVM.simulatorModel.response = data;
             }).error((data, status, headers, config) => {
@@ -67,8 +58,8 @@ angular.module('em-drewbot').controller('SimulatorController', ['$http', 'bot', 
             }
         };
 
-        simulatorVM.playback = () => {
-            bot.playback();
+        simulatorVM.playStrokes = () => {
+            bot.playStrokes();
         };
 
         simulatorVM.messageKeypress = (event) => {
@@ -85,4 +76,4 @@ angular.module('em-drewbot').controller('SimulatorController', ['$http', 'bot', 
             bot.whatTimeIsIt();
         };
     }
-]);
+})();

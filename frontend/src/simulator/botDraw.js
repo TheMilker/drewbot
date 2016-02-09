@@ -1,12 +1,17 @@
-angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
-    function(simulatorDataService) {
+(function() {
+    'use strict';
+    angular.module('em-drewbot').factory('botDraw', botDraw);
+    
+    botDraw.$inject = ['simulatorDataService', 'drewbotCanvas'];
+    
+    function botDraw(simulatorDataService, drewbotCanvas) {
 
         var instance = {};
 
         var simulatorModel = simulatorDataService.getSimulatorModel();
         
         function getCanvasElement() {
-            return document.getElementById("drewbotCanvas");
+            return drewbotCanvas.get()[0];
         }
         
         instance.getContext = function() {
@@ -15,8 +20,6 @@ angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
 
         instance.addOutputText = function(str) {
             simulatorModel.commands = simulatorModel.commands + str + '\n';
-            var elem = document.getElementById("output");
-            elem.scrollTop = elem.scrollHeight;
         };
 
         instance.clearCanvas = function() {
@@ -65,8 +68,6 @@ angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
         instance.addOutputPositionText = function(stroke) {
             var point = stroke.point;
             simulatorModel.strokes = simulatorModel.strokes + '{ "x": ' + Math.floor(point.x) + ', "y": ' + Math.floor(point.y) + ', "draw": ' + stroke.draw + ' },';
-            var elem = document.getElementById("outputPosition");
-            elem.scrollTop = elem.scrollHeight;
         };
 
         instance.drawCircle = function(point, length) {
@@ -110,5 +111,5 @@ angular.module('em-drewbot').factory('botDraw', ["simulatorDataService",
         }
 
       return instance;
-   }]
-);
+   }
+})();

@@ -1,1 +1,4 @@
-angular.module('em-drewbot', []);
+(function() {
+    'use strict';
+    angular.module('em-drewbot', []);
+})();

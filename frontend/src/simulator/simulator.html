@@ -5,28 +5,28 @@
 
     <div>
         <button ng-click="simulatorVM.whatTimeIsIt()">What time is it?</button>
-    	<button ng-click="simulatorVM.playback()">Play Strokes!</button>
+    	
 
-       	<input id="message" ng-keypress="simulatorVM.messageKeypress($event)" ></input>
+       	<input id="message" ng-keypress="simulatorVM.messageKeypress($event)" ng-model="simulatorVM.simulatorModel.message"></input>
     	<button ng-click="simulatorVM.doMessage()">Play Message!</button>
         <label>Recording: <input type="checkbox" ng-model="simulatorVM.simulatorModel.isRecording" ng-change="recordingClicked()" /></label>
     </div>
 
-    <div>
-        <span>Bot Commands: </span> <span id="commandCount"> {{simulatorVM.getCommandCount()}} </span>
-    </div>
     <div id="commandsContainer">
         <div>
             <div><button ng-click="simulatorVM.sendCommands()">Send Commands</button></div>
-            <div><textarea id="output" type="text" rows="10" cols="20" ng-model="simulatorVM.simulatorModel.commands"></textarea></div>
+            <div><textarea id="output" type="text" rows="10" cols="25" ng-model="simulatorVM.simulatorModel.commands" show-tail></textarea></div>
             <div><button ng-click="simulatorVM.clearCommands()">Clear Commands</button></div>
         </div>
     </div>
 
     <div id="strokesContainer">
-        <div><button ng-click="simulatorVM.sendStrokes()">Send Strokes</button></div>
         <div>
-            <textarea id="outputPosition" type="text" rows="10" cols="20" ng-model="simulatorVM.simulatorModel.strokes"></textarea>
+            <button ng-click="simulatorVM.sendStrokes()">Send Strokes</button>
+            <button ng-click="simulatorVM.playStrokes()">Play Strokes!</button>
+        </div>
+        <div>
+            <textarea id="outputPosition" type="text" rows="10" cols="25" ng-model="simulatorVM.simulatorModel.strokes" show-tail></textarea>
         </div>
         <div><button ng-click="simulatorVM.clearStrokes()">Clear Strokes</button></div>
     </div>
@@ -38,7 +38,7 @@
     <div id="fontContainer">
         <div><button ng-click="simulatorVM.sendFont()">Send Font Strokes</button></div>
         <div>
-            <textarea id="fontOutput" type="text" rows="10" cols="20" ng-model="simulatorVM.simulatorModel.fontStrokes"></textarea>
+            <textarea id="fontOutput" type="text" rows="10" cols="25" ng-model="simulatorVM.simulatorModel.fontStrokes"></textarea>
         </div>
         <div><button ng-click="simulatorVM.clearFontStrokes()">Clear Font Strokes</button></div>
     </div>
