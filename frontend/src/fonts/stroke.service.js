@@ -2,11 +2,11 @@
     'use strict';
     angular.module('em-drewbot').factory('strokeService', strokeService);
 
-    strokeService.$inject = ['simulatorConstants', 'erikFontService', 'digitalFontService'];
-    
-    function strokeService(simulatorConstants, erikFontService, digitalFontService) {
+    strokeService.$inject = ['simulatorConstants', 'erikFontService', 'digitalFontService', 'Stroke'];
+
+    function strokeService(simulatorConstants, erikFontService, digitalFontService, Stroke) {
         var instance = { };
-        
+
         function getFont(fontId) {
             if(erikFontService.getFont().id === fontId) {
                 return erikFontService.getFont();
@@ -16,7 +16,7 @@
                 return erikFontService.getFont();
             }
         }
-        
+
         instance.convertToStrokes = (str, fontId) => {
             var offsetX = simulatorConstants.FIRST_CHAR_X;
             var strokes = [];
@@ -35,7 +35,7 @@
 
             return strokes;
         };
-        
+
         return instance;
     }
 })();

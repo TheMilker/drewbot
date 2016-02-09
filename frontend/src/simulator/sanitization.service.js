@@ -1,16 +1,16 @@
 (function() {
-    'use strict'; 
+    'use strict';
     angular.module('em-drewbot').factory('sanitizationService', sanitizationService);
-    
-    sanitizationService.$inject = ['bot', 'botEngine'];
-    
-    function sanitizationService(bot, botEngine) {
-        
+
+    sanitizationService.$inject = ['bot', 'botEngine', 'Angle'];
+
+    function sanitizationService(bot, botEngine, Angle) {
+
         var globalLeftAngle = new Angle(125, true);
         var globalRightAngle = new Angle(75, true);
 
         var instance = {};
-        
+
         instance.removeDuplicateStrokes = function(strokes) {
             var sanitizedStrokes = [];
             var lastStrokeCommands;
@@ -23,12 +23,12 @@
             });
             return sanitizedStrokes;
         };
-        
+
         function getStrokeCommands(stroke) {
             globalLeftAngle = botEngine.determineBaseAngleFromPosition(stroke, bot.getLeftBaseArm(globalLeftAngle), true);
             globalRightAngle = botEngine.determineBaseAngleFromPosition(stroke, bot.getRightBaseArm(globalRightAngle), false);
-        
-            var commands = {};            
+
+            var commands = {};
             if(stroke.draw) {
                 commands.i = "i102"; //down
             } else {
@@ -37,7 +37,7 @@
             commands.l = "l" + (180 - Math.floor(globalLeftAngle.degrees));
             commands.r = "r" + (180 - Math.floor(globalRightAngle.degrees));
             return commands;
-        } 
+        }
 
         instance.removeExtraUpStokes = function(strokes) {
             var sanitizedStrokes = [];
@@ -52,7 +52,7 @@
             });
             return sanitizedStrokes;
         };
-        
+
         function getLastStroke(strokes, currentIndex) {
             if(currentIndex === 0) {
                 return null;
@@ -60,7 +60,7 @@
                 return strokes[currentIndex-1];
             }
         }
-        
+
         function getNextStroke(strokes, currentIndex) {
             if(currentIndex === strokes.length-1) {
                 return null;

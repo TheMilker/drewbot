@@ -2,14 +2,14 @@
     'use strict';
     angular.module('em-drewbot').factory('bot', bot);
 
-    bot.$inject = ['botEngine', 'simulatorConstants', 'botDraw', 'botDigitalClock', 'simulatorDataService', 'strokeService'];
+    bot.$inject = ['botEngine', 'simulatorConstants', 'botDraw', 'botDigitalClock', 'simulatorDataService', 'strokeService', 'Angle', 'Point', 'Stroke', 'Arm'];
 
-    function bot(botEngine, simulatorConstants, botDraw, botDigitalClock, simulatorDataService, strokeService) {
-        
+    function bot(botEngine, simulatorConstants, botDraw, botDigitalClock, simulatorDataService, strokeService, Angle, Point, Stroke, Arm) {
+
         var instance = {};
 
         var globalLeftAngle = new Angle(125, true);
-        var globalRightAngle = new Angle(75, true);   
+        var globalRightAngle = new Angle(75, true);
 
         var strokePoints = [];
 
@@ -19,7 +19,7 @@
         instance.moveToMousePos = function moveToMousePos(canvas, evt, mouseDown) {
             var rect = canvas.getBoundingClientRect();
             var stroke = new Stroke(
-                evt.clientX - rect.left, 
+                evt.clientX - rect.left,
                 evt.clientY - rect.top,
                 mouseDown
             );
@@ -104,7 +104,7 @@
             return connectionPoint;
         }
 
-        function draw(baseLeft, baseRight) {       
+        function draw(baseLeft, baseRight) {
 
             // Add box for char size
             botDraw.drawCharOutline({ "x": baseLeft.point.x, "y": simulatorConstants.ARM_LENGTH * 0.9 }, simulatorConstants.ARM_LENGTH * 0.5, simulatorConstants.ARM_LENGTH * 0.5);
@@ -143,10 +143,10 @@
 
         function onePlaybackStep() {
             if(playbackStrokes.length === 0) return;
-            
+
             var stroke = playbackStrokes[playbackIndex++];
             strokePoints.push(stroke);
-            
+
             globalLeftAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getLeftBaseArm(globalLeftAngle), true);
             globalRightAngle = botEngine.determineBaseAngleFromPosition(stroke.point, instance.getRightBaseArm(globalRightAngle), false);
 

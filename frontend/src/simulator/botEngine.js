@@ -1,10 +1,10 @@
 (function() {
     'use strict';
     angular.module('em-drewbot').factory('botEngine', botEngine);
-    
-    botEngine.$inject = ['simulatorConstants'];
-    
-    function botEngine(simulatorConstants) {
+
+    botEngine.$inject = ['simulatorConstants', 'Angle', 'Point'];
+
+    function botEngine(simulatorConstants, Angle, Point) {
 
         var instance = {};
 

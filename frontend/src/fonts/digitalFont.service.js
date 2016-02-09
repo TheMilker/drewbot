@@ -2,20 +2,20 @@
     'use strict';
     angular.module('em-drewbot').factory('digitalFontService', digitalFontService);
 
-    digitalFontService.$inject = ['simulatorConstants'];
-    
-    function digitalFontService(simulatorConstants) {
-      
+    digitalFontService.$inject = ['simulatorConstants', 'Point', 'Stroke'];
+
+    function digitalFontService(simulatorConstants, Point, Stroke) {
+
         var instance = {};
-        
+
         var digitalFont = {
             id: 'digital'
         };
-        
-        instance.getFont = () => { 
+
+        instance.getFont = () => {
             return digitalFont;
         };
-      
+
         // the line segments are defined as.
         // 1 is the top line, 2 is center line, 3 is the bottom line
         // 4 is top left, 5 is top right
@@ -41,13 +41,13 @@
         var BOTTOMCENTERSEGMENT = 15;
         var VBOTTOMLEFTSEGMENT = 16;
         var VBOTTOMRIGHTSEGMENT = 17;
-        
+
         _.forEach("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:", (letter) => {
             var segs = charToSegments(letter);
             var pointOffset = new Point(simulatorConstants.DIGIT_OFFSET, simulatorConstants.ARM_LENGTH);
             digitalFont[letter.toString()] = getSegmentStrokes(segs, pointOffset);
         });
-      
+
         function shiftPoint(stroke, shift) {
             return new Stroke(stroke.point.x + shift.x, stroke.point.y + shift.y, stroke.draw);
         }
@@ -60,7 +60,7 @@
         function skew2(point) {
             return skew(skew(point));
         }
-      
+
         function getSegmentStrokes(segments, shift) {
             var strokes = [];
             var lenFactor = 0.9;
