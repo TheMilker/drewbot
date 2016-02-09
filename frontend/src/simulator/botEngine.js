@@ -10,7 +10,7 @@
 
         instance.determineBaseAngleFromPosition = function(pos, baseArm, isLeft) {
 
-            var points = instance.circleIntersectionPoints(baseArm.point, baseArm.length, pos, simulatorConstants.ARMLENGTH);
+            var points = instance.circleIntersectionPoints(baseArm.point, baseArm.length, pos, simulatorConstants.ARM_LENGTH);
             // Use the correct intersection point
             var x;
             var y;

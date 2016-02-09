@@ -4,7 +4,9 @@
 
     function erikFontService() {
         var instance = {};
-        var erikFont = {};
+        var erikFont = {
+            id: 'erik'
+        };
 
         instance.getFont = () => { 
             return erikFont;

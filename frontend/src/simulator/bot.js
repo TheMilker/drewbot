@@ -2,9 +2,9 @@
     'use strict';
     angular.module('em-drewbot').factory('bot', bot);
 
-    bot.$inject = ['botEngine', 'simulatorConstants', 'botDraw', 'botDigitalClock', 'botCharGenerator', 'simulatorDataService'];
+    bot.$inject = ['botEngine', 'simulatorConstants', 'botDraw', 'botDigitalClock', 'simulatorDataService', 'strokeService'];
 
-    function bot(botEngine, simulatorConstants, botDraw, botDigitalClock, botCharGenerator, simulatorDataService) {
+    function bot(botEngine, simulatorConstants, botDraw, botDigitalClock, simulatorDataService, strokeService) {
         
         var instance = {};
 
@@ -107,7 +107,7 @@
         function draw(baseLeft, baseRight) {       
 
             // Add box for char size
-            botDraw.drawCharOutline({ "x": baseLeft.point.x, "y": simulatorConstants.ARMLENGTH * 0.9 }, simulatorConstants.ARMLENGTH * 0.5, simulatorConstants.ARMLENGTH * 0.5);
+            botDraw.drawCharOutline({ "x": baseLeft.point.x, "y": simulatorConstants.ARM_LENGTH * 0.9 }, simulatorConstants.ARM_LENGTH * 0.5, simulatorConstants.ARM_LENGTH * 0.5);
 
             var leftEndPoint = servoEndPoint(baseLeft);
             var rightEndPoint = servoEndPoint(baseRight);
@@ -132,12 +132,12 @@
         }
 
         instance.getLeftBaseArm = function(angle) {
-            var arm = new Arm(simulatorConstants.ARMLENGTH * 2, 0, angle, simulatorConstants.ARMLENGTH);
+            var arm = new Arm(simulatorConstants.ARM_LENGTH * 2, 0, angle, simulatorConstants.ARM_LENGTH);
             return arm;
         };
 
         instance.getRightBaseArm = function(angle) {
-            var arm = new Arm(simulatorConstants.ARMLENGTH * 2 + 4 * 20, 0, angle, simulatorConstants.ARMLENGTH);
+            var arm = new Arm(simulatorConstants.ARM_LENGTH * 2 + 4 * 20, 0, angle, simulatorConstants.ARM_LENGTH);
             return arm;
         };
 
@@ -208,7 +208,7 @@
 
         instance.doMessage = function() {
 
-            playbackStrokes = botCharGenerator.convertToStrokes(simulatorDataService.getMessage());
+            playbackStrokes = strokeService.convertToStrokes(simulatorDataService.getMessage());
             instance.clearStrokePoints();
             playbackStrokes.push(new Stroke(310,190,false));
             playbackIndex = 0;

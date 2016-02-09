@@ -2,9 +2,9 @@
     'use strict';
     angular.module('em-drewbot').factory('botDigitalClock', botDigitalClock);
     
-    botDigitalClock.$inject = ['botCharGenerator'];
+    botDigitalClock.$inject = ['strokeService'];
     
-    function botDigitalClock(botCharGenerator) {
+    function botDigitalClock(strokeService) {
 
         var instance = {};
         
@@ -26,7 +26,7 @@
         
             var timeString = hours + ":" + minutes;
         
-            return botCharGenerator.convertToStrokes(timeString);
+            return strokeService.convertToStrokes(timeString, "digital");
         };
         
         return instance;
