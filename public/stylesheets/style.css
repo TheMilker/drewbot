@@ -7,6 +7,11 @@ a {
     color: #00B7FF;
 }
 
+#testControlsContainer {
+    padding: 10px;
+    float: left;
+}
+
 #commandsContainer {
     padding: 10px;
     float: left;
@@ -31,11 +36,11 @@ a {
     float: left;
 }
 
-#drewbotCanvas { 
+#drewbotCanvas {
     background:url(../images/paper.jpg);
     background-position-y: -150px;
     background-position-x: -75px;
-    display:block; 
-    margin:1em auto; 
+    display:block;
+    margin:1em auto;
     border:1px solid black;
 }

@@ -1,15 +1,24 @@
 <div class="controls">
-    <div class="calibration">
-        <button ng-click="TestControlsVM.left90()">Set Left To 90 -- 'l90'</button>
-        <button ng-click="TestControlsVM.right90()">Set Right To 90 -- 'r90'</button>
-        <button ng-click="TestControlsVM.lifter90()">Set Lifter To 90 -- 'i90'</button>
+    <div id="testControlsContainer">
+        <div class="calibration">
+            <button ng-click="TestControlsVM.left90()">Set Left To 90 -- 'l90'</button>
+            <button ng-click="TestControlsVM.right90()">Set Right To 90 -- 'r90'</button>
+            <button ng-click="TestControlsVM.lifter90()">Set Lifter To 90 -- 'i90'</button>
+        </div>
+        <div class="test">
+            <input type="text" ng-model="TestControlsVM.customCommand" placeholder="send a custom command"/>
+            <button ng-click="TestControlsVM.sendCustomCommand()">Send</button>
+        </div>
+        <div>
+            <button ng-click="TestControlsVM.connectArduino()">Connect Arduino</button>
+        </div>
     </div>
-    <div class="test">
-        <input type="text" ng-model="TestControlsVM.customCommand" placeholder="send a custom command"/>
-        <button ng-click="TestControlsVM.sendCustomCommand()">Send</button>
-    </div>
-    <div>
-        <button ng-click="TestControlsVM.connectArduino()">Connect Arduino</button>
+    <div id="commandsContainer">
+        <div>
+            <div><button ng-click="TestControlsVM.sendCommands()">Send Commands</button></div>
+            <div><textarea id="output" type="text" rows="10" cols="25" ng-model="TestControlsVM.simulatorModel.commands" show-tail></textarea></div>
+            <div><button ng-click="TestControlsVM.clearCommands()">Clear Commands</button></div>
+        </div>
     </div>
     <p>{{TestControlsVM.commandResponse}}</p>
 </div>
