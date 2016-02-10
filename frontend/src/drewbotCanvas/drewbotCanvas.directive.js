@@ -2,9 +2,9 @@
     'use strict';    
     angular.module('em-drewbot').directive('emDrewbotCanvas', emDrewbotCanvas);
 
-    emDrewbotCanvas.$inject = ['bot', 'simulatorDataService', 'drewbotCanvas'];
+    emDrewbotCanvas.$inject = ['drewbotService', 'simulatorDataService', 'drewbotCanvasService'];
 
-    function emDrewbotCanvas(bot, simulatorDataService, drewbotCanvas) {
+    function emDrewbotCanvas(drewbotService, simulatorDataService, drewbotCanvasService) {
         var directive = {
             scope: {},
             templateUrl: 'drewbotCanvas/drewbotCanvas.html',
@@ -15,18 +15,19 @@
         return directive;
         
         function link($scope, canvasElement, attrs) {
-            drewbotCanvas.set(canvasElement);
+            drewbotCanvasService.setCanvas(canvasElement[0]);
+            
             var mouseDown = false;
             canvasElement.on('mousemove', (event) => {
                 simulatorDataService.getSimulatorModel().isRecording = event.shiftKey;
-                bot.moveToMousePos(canvasElement[0], event, mouseDown);
+                drewbotService.moveToMousePos(canvasElement[0], event, mouseDown);
                 $scope.$apply();
             });
 
             canvasElement.on('mousedown', (event) => {
                 if(!event.shiftKey) {
                     simulatorDataService.clearStrokesAndCommands();
-                    bot.clearStrokePoints();
+                    drewbotService.clearStrokePoints();
                     $scope.$apply();
                 }
                 mouseDown = true;
@@ -36,7 +37,7 @@
                 mouseDown = false;
             });
 
-            bot.update();
+            drewbotService.update();
         }
     }
 })();

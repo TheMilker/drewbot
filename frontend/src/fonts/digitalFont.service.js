@@ -1,3 +1,4 @@
+//TASK: this font is currently broken, might be fun to fix someday
 (function() {
     'use strict';
     angular.module('em-drewbot').factory('digitalFontService', digitalFontService);

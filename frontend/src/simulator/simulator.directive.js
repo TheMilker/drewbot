@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    //TODO: convert to component
     angular.module('em-drewbot').directive('emSimulator', emSimulator);
 
     function emSimulator() {

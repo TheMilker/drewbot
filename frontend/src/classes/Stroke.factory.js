@@ -8,6 +8,8 @@
         function Stroke(x, y, draw) {
             this.point = new Point(x, y);
             this.draw = draw;
+            this.x = x;
+            this.y = y;
         }
         return Stroke;
     }

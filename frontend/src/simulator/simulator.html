@@ -1,12 +1,6 @@
 <div>
-	<div>
-		<em-drewbot-canvas></em-drewbot-canvas>
-	</div>
-
     <div>
         <button ng-click="simulatorVM.whatTimeIsIt()">What time is it?</button>
-    	
-
        	<input id="message" ng-keypress="simulatorVM.messageKeypress($event)" ng-model="simulatorVM.simulatorModel.message"></input>
     	<button ng-click="simulatorVM.doMessage()">Play Message!</button>
         <label>Recording: <input type="checkbox" ng-model="simulatorVM.simulatorModel.isRecording" ng-change="recordingClicked()" /></label>

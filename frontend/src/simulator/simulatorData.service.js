@@ -13,10 +13,6 @@
             message: "",
             isRecording: false
         };
-        
-        function endsWith(str, suffix) {
-            return str.indexOf(suffix, str.length - suffix.length) !== -1;
-        }
 
         instance.getSimulatorModel = () => {
             return simulatorModel;
@@ -27,7 +23,12 @@
         };
         
         instance.getMessage = () => {
-        return simulatorModel.message;  
+            return simulatorModel.message;  
+        };
+        
+        instance.appendStroke = (stroke) => {
+            var point = stroke.point;
+            simulatorModel.strokes = simulatorModel.strokes + '{ "x": ' + Math.floor(point.x) + ', "y": ' + Math.floor(point.y) + ', "draw": ' + stroke.draw + ' },';
         };
         
         instance.getStrokesAsJSONArray = () => {
@@ -35,6 +36,14 @@
                 simulatorModel.strokes = simulatorModel.strokes.substring(0, simulatorModel.strokes.length - 1);
             }
             return JSON.parse("[" + simulatorModel.strokes + "]");
+        };
+        
+        instance.appendCommand = (command) => {
+            simulatorModel.commands = simulatorModel.commands + command + '\n';
+        };
+        
+        instance.getCommandsAsArray = () => {
+            return simulatorModel.commands.trim().split("\n");
         };
 
         instance.clearModel = () => {
@@ -61,6 +70,10 @@
         instance.clearFontStrokes = () => {
             simulatorModel.fontStrokes = "";
         };
+        
+        function endsWith(str, suffix) {
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
+        }
         
         return instance;
     }

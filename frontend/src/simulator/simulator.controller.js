@@ -2,25 +2,24 @@
     'use strict'; 
     angular.module('em-drewbot').controller('SimulatorController', SimulatorController);
     
-    SimulatorController.$inject = ['$http', 'bot', 'simulatorDataService', 'sanitizationService'];
+    SimulatorController.$inject = ['$http', 'drewbotService', 'simulatorDataService', 'strokeService'];
     
-    function SimulatorController($http, bot, simulatorDataService, sanitizationService) {
+    function SimulatorController($http, drewbotService, simulatorDataService, strokeService) {
         var simulatorVM = this;
         
+        simulatorVM.response = "";        
         simulatorVM.simulatorModel = simulatorDataService.getSimulatorModel();
         simulatorVM.clearCommands = simulatorDataService.clearCommands;
         simulatorVM.clearStrokes = simulatorDataService.clearStrokes;
         simulatorVM.clearFontStrokes = simulatorDataService.clearFontStrokes;
-
+        
         simulatorVM.sendCommands = () => {
-            var commandsArray = simulatorVM.simulatorModel.commands.trim().split("\n");
-
+            var commandsArray = simulatorDataService.getCommandsAsArray();
             console.log("sending commands: ", commandsArray);
-
             $http.post('/commands', {commands: commandsArray}).success((data, status, headers, config) => {
-                simulatorVM.simulatorModel.response = data;
+                simulatorVM.response = data;
             }).error((data, status, headers, config) => {
-                simulatorVM.simulatorModel.response = data;
+                simulatorVM.response = data;
             });
         };
 
@@ -28,16 +27,16 @@
             var JSONStrokes = simulatorDataService.getStrokesAsJSONArray();
             console.log("Recorded Strokes: ", JSONStrokes);
             $http.post('/drawStrokes', {strokes: JSONStrokes}).success((data, status, headers, config) => {
-                simulatorVM.simulatorModel.response = data;
+                simulatorVM.response = data;
             }).error((data, status, headers, config) => {
-                simulatorVM.simulatorModel.response = data;
+                simulatorVM.response = data;
             });
         };
         
         simulatorVM.makeFont = () => {
             var JSONStrokes = simulatorDataService.getStrokesAsJSONArray();
-            JSONStrokes = sanitizationService.removeDuplicateStrokes(JSONStrokes);
-            JSONStrokes = sanitizationService.removeExtraUpStokes(JSONStrokes);
+            JSONStrokes = strokeService.removeDuplicateStrokes(JSONStrokes);
+            JSONStrokes = strokeService.removeExtraUpStokes(JSONStrokes);
             simulatorVM.simulatorModel.fontStrokes = JSON.stringify(JSONStrokes);
         };
         
@@ -45,21 +44,21 @@
             var JSONStrokes = JSON.parse(simulatorVM.simulatorModel.fontStrokes);
             console.log("Font Strokes: ", JSONStrokes);
             $http.post('/drawStrokes', {strokes: JSONStrokes}).success((data, status, headers, config) => {
-                simulatorVM.simulatorModel.response = data;
+                simulatorVM.response = data;
             }).error((data, status, headers, config) => {
-                simulatorVM.simulatorModel.response = data;
+                simulatorVM.response = data;
             });
         };
 
         simulatorVM.recordingClicked = () => {
             if(simulatorVM.simulatorModel.isRecording) {
                 simulatorDataService.clearStrokesAndCommands();
-                bot.clearStrokePoints();
+                drewbotService.clearStrokePoints();
             }
         };
 
         simulatorVM.playStrokes = () => {
-            bot.playStrokes();
+            drewbotService.playStrokes();
         };
 
         simulatorVM.messageKeypress = (event) => {
@@ -69,11 +68,11 @@
         };
 
         simulatorVM.doMessage = () => {
-            bot.doMessage();
+            drewbotService.doMessage();
         };
 
         simulatorVM.whatTimeIsIt = () => {
-            bot.whatTimeIsIt();
+            drewbotService.whatTimeIsIt();
         };
     }
 })();
