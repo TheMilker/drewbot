@@ -2,14 +2,14 @@
     'use strict';
     angular.module('em-drewbot').controller('TestControlsController', TestControlsController);
 
-    TestControlsController.$inject = ['$http', 'simulatorDataService'];
+    TestControlsController.$inject = ['$http', 'testControlsService'];
 
-    function TestControlsController($http, simulatorDataService) {
+    function TestControlsController($http, testControlsService) {
         var TestControlsVM = this;
         TestControlsVM.commandResponse = "";
         TestControlsVM.customCommand = "";
-        TestControlsVM.simulatorModel = simulatorDataService.getSimulatorModel();
-        TestControlsVM.clearCommands = simulatorDataService.clearCommands; //TODO rename testControls to arduinoTestControls
+        TestControlsVM.testControlsModel = testControlsService.getTestControlsModel();
+        TestControlsVM.clearCommands = testControlsService.clearCommands; //TODO rename testControls to arduinoTestControls
 
         TestControlsVM.left90 = () => sendCommand("l90\n");
 
@@ -41,7 +41,7 @@
         }
 
         TestControlsVM.sendCommands = () => {
-            var commandsArray = simulatorDataService.getCommandsAsArray();
+            var commandsArray = testControlsService.getCommandsAsArray();
             console.log("sending commands: ", commandsArray);
             $http.post('/commands', {commands: commandsArray}).success((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;

@@ -2,9 +2,9 @@
     'use strict';
     angular.module('em-drewbot').factory('drewbotService', drewbotService);
 
-    drewbotService.$inject = ['drewbotEngineService', 'simulatorConstants', 'drewbotCanvasService','simulatorDataService', 'strokeService', 'Angle', 'Point', 'Stroke'];
+    drewbotService.$inject = ['drewbotEngineService', 'simulatorConstants', 'drewbotCanvasService','fontCreationControlsService', 'strokeService', 'Angle', 'Point', 'Stroke', 'testControlsService'];
 
-    function drewbotService(drewbotEngineService, simulatorConstants, drewbotCanvasService, simulatorDataService, strokeService, Angle, Point, Stroke) {
+    function drewbotService(drewbotEngineService, simulatorConstants, drewbotCanvasService, fontCreationControlsService, strokeService, Angle, Point, Stroke, testControlsService) {
 
         var instance = {};
 
@@ -67,14 +67,14 @@
             globalRightAngle = drewbotEngineService.determineBaseAngleFromPosition(positionPoint, drewbotEngineService.getRightBaseArm(globalRightAngle), false);
 
             appendCommands(globalLeftAngle, globalRightAngle);
-            simulatorDataService.appendStroke(positionStroke);
+            fontCreationControlsService.appendStroke(positionStroke);
 
             instance.update();
         }
 
         function appendCommands(leftAngle, rightAngle) {
-            simulatorDataService.appendCommand("L" + (180 - Math.floor(leftAngle.degrees)));
-            simulatorDataService.appendCommand("R" + (180 - Math.floor(rightAngle.degrees)));
+            testControlsService.appendCommand("L" + (180 - Math.floor(leftAngle.degrees)));
+            testControlsService.appendCommand("R" + (180 - Math.floor(rightAngle.degrees)));
         }
 
         function servoEndPoint(arm) {
@@ -156,9 +156,9 @@
             drewbotCanvasService.addTextAtPosition("  (" + Math.floor(connectionPoint.x) + "," + Math.floor(connectionPoint.y) + ")", stroke.point);
 
             if(stroke.draw) {
-                simulatorDataService.appendCommand("i102");
+                testControlsService.appendCommand("i102");
             } else {
-                simulatorDataService.appendCommand("i90");
+                testControlsService.appendCommand("i90");
             }
 
             appendCommands(globalLeftAngle, globalRightAngle);
@@ -172,7 +172,7 @@
 
         instance.playStrokes = () => {
             playbackStrokes = [];
-            var jsonStrokes = simulatorDataService.getStrokesAsJSONArray();
+            var jsonStrokes = fontCreationControlsService.getStrokesAsJSONArray();
             _.forEach(jsonStrokes, (stroke) =>{
                 playbackStrokes.push(new Stroke(stroke.x, stroke.y, stroke.draw));
             });
@@ -193,7 +193,7 @@
 
         instance.doMessage = () => {
 
-            playbackStrokes = strokeService.convertToStrokes(simulatorDataService.getMessage());
+            playbackStrokes = strokeService.convertToStrokes(fontCreationControlsService.getMessage());
             instance.clearStrokePoints();
             playbackStrokes.push(new Stroke(310,190,false));
             playbackIndex = 0;

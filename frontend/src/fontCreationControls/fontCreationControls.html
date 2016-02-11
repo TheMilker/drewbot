@@ -1,7 +1,7 @@
 <div>
     <div>
         <button ng-click="fontCreationControlsVM.whatTimeIsIt()">What time is it?</button>
-       	<input id="message" ng-keypress="fontCreationControlsVM.messageKeypress($event)" ng-model="fontCreationControlsVM.simulatorModel.message"></input>
+       	<input id="message" ng-keypress="fontCreationControlsVM.messageKeypress($event)" ng-model="fontCreationControlsVM.fontCreationControlsModel.message"></input>
     	<button ng-click="fontCreationControlsVM.doMessage()">Play Message!</button>
     </div>
     <div id="strokesContainer">
@@ -10,13 +10,13 @@
             <button ng-click="fontCreationControlsVM.playStrokes()">Play Strokes!</button>
         </div>
         <div>
-            <textarea id="outputPosition" type="text" rows="10" cols="25" ng-model="fontCreationControlsVM.simulatorModel.strokes" show-tail></textarea>
+            <textarea id="outputPosition" type="text" rows="10" cols="25" ng-model="fontCreationControlsVM.fontCreationControlsModel.strokes" show-tail></textarea>
         </div>
         <div><button ng-click="fontCreationControlsVM.clearStrokes()">Clear Strokes</button></div>
     </div>
     <div id="makeFont">
         <button ng-click="fontCreationControlsVM.makeFont()">Make Font -></button>
-        <label>Recording: <input type="checkbox" ng-model="fontCreationControlsVM.simulatorModel.isRecording" ng-change="fontCreationControlsVM.recordingClicked()" /></label>
+        <label>Recording: <input type="checkbox" ng-model="fontCreationControlsVM.fontCreationControlsModel.isRecording" ng-change="fontCreationControlsVM.recordingClicked()" /></label>
     </div>
     <div id="fontContainer">
         <div>
@@ -24,7 +24,7 @@
             <button ng-click="fontCreationControlsVM.playFontStrokes()">Play Font Strokes!</button>
         </div>
         <div>
-            <textarea id="fontOutput" type="text" rows="10" cols="25" ng-model="fontCreationControlsVM.simulatorModel.fontStrokes"></textarea>
+            <textarea id="fontOutput" type="text" rows="10" cols="25" ng-model="fontCreationControlsVM.fontCreationControlsModel.fontStrokes"></textarea>
         </div>
         <div><button ng-click="fontCreationControlsVM.clearFontStrokes()">Clear Font Strokes</button></div>
     </div>
