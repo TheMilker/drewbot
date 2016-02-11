@@ -1,13 +1,13 @@
 <div>
     <div>
-        <button ng-click="fontCreationControlsVM.whatTimeIsIt()">What time is it?</button>
-       	<input id="message" ng-keypress="fontCreationControlsVM.messageKeypress($event)" ng-model="fontCreationControlsVM.fontCreationControlsModel.message"></input>
-    	<button ng-click="fontCreationControlsVM.doMessage()">Play Message!</button>
+        <button ng-click="fontCreationControlsVM.simulateCurrentTime()">What time is it?</button>
+       	<input id="message" placeholder="Type characters here and test font." ng-keypress="fontCreationControlsVM.messageKeypress($event)" ng-model="fontCreationControlsVM.fontCreationControlsModel.message"></input>
+    	<button ng-click="fontCreationControlsVM.playMessage()">Test Font!</button>
     </div>
     <div id="strokesContainer">
         <div>
             <button ng-click="fontCreationControlsVM.sendStrokes()">Send Strokes</button>
-            <button ng-click="fontCreationControlsVM.playStrokes()">Play Strokes!</button>
+            <button ng-click="fontCreationControlsVM.simulateStrokes()">Simulate Strokes!</button>
         </div>
         <div>
             <textarea id="outputPosition" type="text" rows="10" cols="25" ng-model="fontCreationControlsVM.fontCreationControlsModel.strokes" show-tail></textarea>
@@ -21,7 +21,7 @@
     <div id="fontContainer">
         <div>
             <button ng-click="fontCreationControlsVM.sendFont()">Send Font Strokes</button>
-            <button ng-click="fontCreationControlsVM.playFontStrokes()">Play Font Strokes!</button>
+            <button ng-click="fontCreationControlsVM.simulateFontStrokes()">Simulate Font Strokes!</button>
         </div>
         <div>
             <textarea id="fontOutput" type="text" rows="10" cols="25" ng-model="fontCreationControlsVM.fontCreationControlsModel.fontStrokes"></textarea>

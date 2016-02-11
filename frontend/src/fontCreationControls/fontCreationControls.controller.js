@@ -14,16 +14,16 @@
 
         fontCreationControlsVM.messageKeypress = (event) => {
            if (event.keyCode == 13) {
-              fontCreationControlsVM.doMessage();
+              fontCreationControlsVM.playMessage();
            }
         };
 
-        fontCreationControlsVM.doMessage = () => {
-            drewbotService.doMessage();
+        fontCreationControlsVM.playMessage = () => {
+            drewbotService.simulateString(fontCreationControlsVM.fontCreationControlsModel.message);
         };
 
-        fontCreationControlsVM.whatTimeIsIt = () => {
-            drewbotService.whatTimeIsIt();
+        fontCreationControlsVM.simulateCurrentTime = () => {
+            drewbotService.simulateCurrentTime();
         };
 
         fontCreationControlsVM.sendStrokes = () => {
@@ -36,8 +36,8 @@
             });
         };
 
-        fontCreationControlsVM.playStrokes = () => {
-            drewbotService.playStrokes();
+        fontCreationControlsVM.simulateStrokes = () => {
+            drewbotService.simulateStrokes(fontCreationControlsService.getStrokesAsJSONArray());
         };
 
         fontCreationControlsVM.makeFont = () => {
@@ -57,8 +57,8 @@
             });
         };
 
-        fontCreationControlsVM.playFontStrokes = () => {
-            //drewbotService.playStrokes(); TODO maybe playStrokes() takes the strokes as a parameter
+        fontCreationControlsVM.simulateFontStrokes = () => {
+            drewbotService.simulateStrokes(JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes));
         };
 
         fontCreationControlsVM.recordingClicked = () => {
