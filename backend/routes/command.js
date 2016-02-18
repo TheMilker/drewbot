@@ -5,9 +5,14 @@ var serialportService = require('./../services/serialportService');
 var router = express.Router();
 
 router.post('/', function(req, res) {
+    
+    var command = req.body.command;
+    if(!drewbotUtils.endsWith(command, "\n")) {
+        command = command+"\n";
+    }
 
-    serialportService.writeCommand(req.body.command);
-    res.send("Command " + req.body.command +" Sent." + drewbotUtils.getCurrentFormattedTime());
+    serialportService.writeCommand(command);
+    res.send("Command " + command +" Sent." + drewbotUtils.getCurrentFormattedTime());
 });
 
 module.exports = router;

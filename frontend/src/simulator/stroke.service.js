@@ -15,18 +15,30 @@
             var offsetX = simulatorConstants.FIRST_CHAR_X;
             var strokes = [];
             var font = erikFontService.getFont();
+            
+            // _.each(str, (currentCharacter, index) => {
+            //     console.log("currentCharacter: ", currentCharacter);
+            //     var characterStrokes = font[currentCharacter+""];
+                
+                
+            //     _.each(characterStrokes, (strokeData, index) => {
+            //         strokes.push(new Stroke(strokeData.x + offsetX, strokeData.y, strokeData.draw));
+            //     });
+            //     strokes.push(new Stroke(currentCharacter[index-1].x + offsetX, currentCharacter[index-1].y, false));
+            //     offsetX += simulatorConstants.DIGIT_OFFSET;
+            // });
 
             for (var c = 0; c < str.length; c++) {
-                console.log("str[c]: ", str[c]);
                 var currentChar = font[str[c]];
-
+                
+                strokes.push(new Stroke(currentChar[0].x + offsetX, currentChar[0].y, false));
                 for (var cc = 0; cc < currentChar.length; cc++ ) {
-                    strokes.push(new Stroke(currentChar[cc].x + offsetX, currentChar[cc].y, cc !== 0));
+                    strokes.push(new Stroke(currentChar[cc].x + offsetX, currentChar[cc].y, currentChar[cc].draw));
                 }
-                strokes.push(new Stroke(currentChar[cc-1].x + offsetX, currentChar[cc-1].y, false));
+                strokes.push(new Stroke(currentChar[currentChar.length-1].x + offsetX, currentChar[currentChar.length-1].y, false));
+                
                 offsetX += simulatorConstants.DIGIT_OFFSET;
             }
-
             return strokes;
         };
         
