@@ -2,9 +2,9 @@
     'use strict';
     angular.module('em-drewbot').controller('TestControlsController', TestControlsController);
 
-    TestControlsController.$inject = ['$http', 'testControlsService'];
+    TestControlsController.$inject = ['arduinoService', 'testControlsService'];
 
-    function TestControlsController($http, testControlsService) {
+    function TestControlsController(arduinoService, testControlsService) {
         var TestControlsVM = this;
         TestControlsVM.commandResponse = "";
         TestControlsVM.customCommand = "";
@@ -18,7 +18,7 @@
         TestControlsVM.lifter90 = () => sendCommand("i90\n");
 
         TestControlsVM.connectArduino = () => {
-            $http.post('/connectArduino').success((data, status, headers, config) => {
+            arduinoService.connectArduino().success((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;
             }).error((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;
@@ -33,7 +33,7 @@
         };
 
         function sendCommand(command) {
-            $http.post('/command', {command: command}).success((data, status, headers, config) => {
+            arduinoService.sendCommand(command).success((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;
             }).error((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;
@@ -42,8 +42,7 @@
 
         TestControlsVM.sendCommands = () => {
             var commandsArray = testControlsService.getCommandsAsArray();
-            console.log("sending commands: ", commandsArray);
-            $http.post('/commands', {commands: commandsArray}).success((data, status, headers, config) => {
+            arduinoService.sendCommands(commandsArray).success((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;
             }).error((data, status, headers, config) => {
                 TestControlsVM.commandResponse = data;

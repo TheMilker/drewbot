@@ -2,9 +2,9 @@
     'use strict';
     angular.module('em-drewbot').controller('FontCreationControlsController', FontCreationControlsController);
 
-    FontCreationControlsController.$inject = ['$http', 'drewbotService', 'fontCreationControlsService', 'strokeService'];
+    FontCreationControlsController.$inject = ['arduinoService', 'drewbotService', 'fontCreationControlsService', 'strokeService'];
 
-    function FontCreationControlsController($http, drewbotService, fontCreationControlsService, strokeService) {
+    function FontCreationControlsController(arduinoService, drewbotService, fontCreationControlsService, strokeService) {
         var fontCreationControlsVM = this;
 
         fontCreationControlsVM.response = "";
@@ -28,12 +28,7 @@
 
         fontCreationControlsVM.sendStrokes = () => {
             var JSONStrokes = fontCreationControlsService.getStrokesAsJSONArray();
-            console.log("Recorded Strokes: ", JSONStrokes);
-            $http.post('/drawStrokes', {strokes: JSONStrokes}).success((data, status, headers, config) => {
-                fontCreationControlsVM.response = data;
-            }).error((data, status, headers, config) => {
-                fontCreationControlsVM.response = data;
-            });
+            drawStrokes(JSONStrokes);
         };
 
         fontCreationControlsVM.simulateStrokes = () => {
@@ -49,13 +44,16 @@
 
         fontCreationControlsVM.sendFont = () => {
             var JSONStrokes = JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes);
-            console.log("Font Strokes: ", JSONStrokes);
-            $http.post('/drawStrokes', {strokes: JSONStrokes}).success((data, status, headers, config) => {
+            drawStrokes(JSONStrokes);
+        };
+        
+        function drawStrokes(JSONStrokes) {
+            arduinoService.drawStrokes(JSONStrokes).success((data, status, headers, config) => {
                 fontCreationControlsVM.response = data;
             }).error((data, status, headers, config) => {
                 fontCreationControlsVM.response = data;
             });
-        };
+        }
 
         fontCreationControlsVM.simulateFontStrokes = () => {
             drewbotService.simulateStrokes(JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes));

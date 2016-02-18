@@ -157,23 +157,22 @@
         }    
 
         instance.simulateStrokes = (strokes) => {
+            testControlsService.clearCommands();
             var newPlayBackStrokes = [];
             _.forEach(strokes, (stroke) =>{
                 newPlayBackStrokes.push(new Stroke(stroke.x, stroke.y, stroke.draw));
             });
-            newPlayBackStrokes.push(new Stroke(310,190,false));
             playBack(newPlayBackStrokes);
         };
 
         instance.simulateCurrentTime = () => {
+            testControlsService.clearCommands();
             instance.simulateStrokes(strokeService.getTimeAsStrokes());
         };       
 
         instance.simulateString = (str) => {
-            var newPlayBackStrokes = strokeService.convertToStrokes(str);
-            newPlayBackStrokes.push(new Stroke(310,190,false));
-
-            playBack(newPlayBackStrokes);
+            testControlsService.clearCommands();
+            instance.simulateStrokes(strokeService.convertToStrokes(str));
         };
         
         function appendCommands(leftAngle, rightAngle, shouldDraw) {
