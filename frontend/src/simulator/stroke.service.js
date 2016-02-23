@@ -2,11 +2,17 @@
     'use strict';
     angular.module('em-drewbot').factory('strokeService', strokeService);
 
-    strokeService.$inject = ['drewbotEngineService', 'simulatorConstants', 'erikFontService', 'Stroke', 'Angle'];
+    strokeService.$inject = ['drewbotEngineService', 'simulatorConstants', 'fontService', 'Stroke', 'Angle'];
 
-    function strokeService(drewbotEngineService, simulatorConstants, erikFontService, Stroke, Angle) {
+    function strokeService(drewbotEngineService, simulatorConstants, fontService, Stroke, Angle) {
         
         var instance = {};
+        var fonts;
+        fontService.getFonts().then((_fonts) => {
+            fonts = _fonts;
+        }).catch((reason) => {
+            console.log("getFonts failed: ", reason);
+        });
         
         var globalLeftAngle = new Angle(125, true);
         var globalRightAngle = new Angle(75, true);
@@ -14,30 +20,19 @@
         instance.convertToStrokes = (str) => {
             var offsetX = simulatorConstants.FIRST_CHAR_X;
             var strokes = [];
-            var font = erikFontService.getFont();
             
-            // _.each(str, (currentCharacter, index) => {
-            //     console.log("currentCharacter: ", currentCharacter);
-            //     var characterStrokes = font[currentCharacter+""];
+            if(fonts && fonts.erik) {
+                var font = fonts.erik;
                 
-                
-            //     _.each(characterStrokes, (strokeData, index) => {
-            //         strokes.push(new Stroke(strokeData.x + offsetX, strokeData.y, strokeData.draw));
-            //     });
-            //     strokes.push(new Stroke(currentCharacter[index-1].x + offsetX, currentCharacter[index-1].y, false));
-            //     offsetX += simulatorConstants.DIGIT_OFFSET;
-            // });
-
-            for (var c = 0; c < str.length; c++) {
-                var currentChar = font[str[c]];
-                
-                strokes.push(new Stroke(currentChar[0].x + offsetX, currentChar[0].y, false));
-                for (var cc = 0; cc < currentChar.length; cc++ ) {
-                    strokes.push(new Stroke(currentChar[cc].x + offsetX, currentChar[cc].y, currentChar[cc].draw));
-                }
-                strokes.push(new Stroke(currentChar[currentChar.length-1].x + offsetX, currentChar[currentChar.length-1].y, false));
-                
-                offsetX += simulatorConstants.DIGIT_OFFSET;
+                _.each(str, (currentCharacter, index) => {
+                    var characterStrokes = font[currentCharacter.toString()];
+                    strokes.push(new Stroke(characterStrokes[0].x + offsetX, characterStrokes[0].y, false));
+                    _.each(characterStrokes, (strokeData) => {
+                        strokes.push(new Stroke(strokeData.x + offsetX, strokeData.y, strokeData.draw));
+                    });
+                    strokes.push(new Stroke(currentCharacter[currentCharacter.length-1].x + offsetX, currentCharacter[currentCharacter.length-1].y, false));
+                    offsetX += simulatorConstants.DIGIT_OFFSET;
+                });
             }
             return strokes;
         };
