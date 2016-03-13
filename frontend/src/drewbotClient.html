@@ -1,5 +1,8 @@
 <div>
-    <em-test-controls></em-test-controls>
-    <em-drewbot-canvas></em-drewbot-canvas>
-	<em-font-creation-controls></em-font-creation-controls>
+    <button ng-click="DrewbotClientVM.toggleTestControls()">Toggle Test Controls</button>
+    <button ng-click="DrewbotClientVM.toggleDrewbotCanvas()">Toggle Simulator</button>
+    <button ng-click="DrewbotClientVM.toggleFontCreationControls()">Toggle Font Creation Controls</button>
+    <em-test-controls ng-show="DrewbotClientVM.showTestControls"></em-test-controls>
+    <em-drewbot-canvas ng-show="DrewbotClientVM.showDrewbotCanvas"></em-drewbot-canvas>
+	<em-font-creation-controls ng-show="DrewbotClientVM.showFontCreationControls"></em-font-creation-controls>
 </div>

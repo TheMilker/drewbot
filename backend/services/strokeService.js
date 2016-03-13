@@ -15,7 +15,7 @@ function getCommands(strokes) {
     return commands;
 }
 
-//one stroke turns into 2 or 3 commands
+//one stroke turns into 3 commands
 function getCommand(stroke, lastStroke) {
     var commands = [];
 
@@ -24,13 +24,16 @@ function getCommand(stroke, lastStroke) {
 
     if(!lastStroke || lastStroke.draw !== stroke.draw) {
         if(stroke.draw) {
+            commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
+            commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
             commands.push("i102"); //down
         } else {
-            commands.push("i90"); //up
+            commands.push("i90");  //up
+            commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
+            commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
         }
     }
-    commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
-    commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
+    
     return commands;
 }
 
