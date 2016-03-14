@@ -1,57 +1,55 @@
-var serialPort = require('serialport');
 var five = require("johnny-five");
 var repl = true;
 // var repl = false;
-var board = new five.Board({ repl: repl });
+var board;
 
 var lifterServo;
 var leftServo;
 var rightServo;
 
-board.on("ready", () => {
-    lifterServo = new five.Servo(9);
-    leftServo = new five.Servo(10);
-    rightServo = new five.Servo(11);
-    // board.pinMode(9, five.Pin.SERVO);
-    // board.pinMode(10, five.Pin.SERVO);
-    // board.pinMode(11, five.Pin.SERVO);
+connect();
 
-    board.repl.inject({
-        i: lifterServo,
-        l: leftServo,
-        r: rightServo
+function connect() {
+    board = new five.Board({ repl: repl });
+    board.on("ready", () => {
+        lifterServo = new five.Servo(9);
+        leftServo = new five.Servo(10);
+        rightServo = new five.Servo(11);
+        // board.pinMode(9, five.Pin.SERVO);
+        // board.pinMode(10, five.Pin.SERVO);
+        // board.pinMode(11, five.Pin.SERVO);
+
+        board.repl.inject({
+            i: lifterServo,
+            l: leftServo,
+            r: rightServo
+        });
     });
-});
-
-var port;
-
-// connect();
-
-// function connect() {
-//     serialPort.list(function(err, ports) {
-//         if(ports) {
-//             console.log("Opening serial port: ", ports.slice(-1)[0].comName);
-//             port = new serialPort.SerialPort(ports.slice(-1)[0].comName, null, false);
-//             port.open(function(err) {
-//                 if(err) {
-//                     console.log("on open err: ", err);
-//                 } else {
-//                     console.log("serial port opened successfully!");
-//                 }
-//             });
-//         } else {
-//             console.log("No devices found on serial ports.");
-//         }
-//     });
-// }
+    
+    board.on("message", function(event) {
+        /*
+            Event {
+                type: "info"|"warn"|"fail",
+                timestamp: Time of event in milliseconds,
+                class: name of relevant component class,
+                message: message [+ ...detail]
+            }
+        */
+        console.log("Received a %s message, from %s, reporting: %s", event.type, event.class, event.message);
+    });
+}
 
 function writeCommand(command) {
-    port.write(command, function(err, results) {
-        if(err) {
-           console.log('err ' + err);
-        }
-        console.log('results ' + results);
-    });
+    var servoId = command.substring(0,1);
+    var servoCommand = parseInt(command.substring(1));
+    
+    if(servoId === "l") {
+        leftServo.to(servoCommand);
+    } else if(servoId === "r") {
+        rightServo.to(servoCommand);
+    } else if(servoId === "i") {
+        lifterServo.to(servoCommand);
+    }
 }
 
 function writeCommands(commands) {
@@ -60,8 +58,8 @@ function writeCommands(commands) {
         if(commands[i].indexOf("i") === -1) {
             (function(i){
                 setTimeout(function() {
-                    var commandL = commands[i] + "\n";
-                    var commandR = commands[i+1] + "\n";
+                    var commandL = commands[i];
+                    var commandR = commands[i+1];
                     writeCommand(commandL);
                     writeCommand(commandR);
                 }, 20 * i);
@@ -70,7 +68,7 @@ function writeCommands(commands) {
         } else {
             (function(i){
                 setTimeout(function() {
-                    var commandI = commands[i] + "\n";
+                    var commandI = commands[i];
                     writeCommand(commandI);
                 }, 20 * i);
             }(i));
@@ -83,5 +81,5 @@ function writeCommands(commands) {
 module.exports = {
     writeCommand: writeCommand,
     writeCommands: writeCommands,
-    //connect: connect
+    connect: connect
 };
