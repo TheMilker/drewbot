@@ -83,6 +83,19 @@ function writeStrokeCommands(strokeCommands) {
     }, 20);
 }
 
+function getServoCommandsArray(strokeCommands) {
+    var servoCommands = [];
+    if(strokeCommand.lifterServoCommand.servoPosition === Constants.SERVO_POSITION.DOWN) {
+        writeServoCommand(strokeCommand.leftServoCommand);
+        writeServoCommand(strokeCommand.rightServoCommand);
+        writeServoCommand(strokeCommand.lifterServoCommand);
+    } else if(strokeCommand.lifterServoCommand.servoPosition === Constants.SERVO_POSITION.UP) {
+        writeServoCommand(strokeCommand.lifterServoCommand);
+        writeServoCommand(strokeCommand.leftServoCommand);
+        writeServoCommand(strokeCommand.rightServoCommand);
+    }
+}
+
 // function writeCommands(commands) {
 //     /* jshint ignore:start */
 //     for (var i = 0; i < commands.length;) {
