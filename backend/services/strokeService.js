@@ -1,40 +1,34 @@
+var Constants = require('./constants');
+
 var ARM_LENGTH_MM = 50;
 var CANVAS_SCALE_FACTOR = 4;
 var ARM_LENGTH = ARM_LENGTH_MM * CANVAS_SCALE_FACTOR;
 var globalLeftAngle = new Angle(125, true);
 var globalRightAngle = new Angle(75, true);
 
-function getCommands(strokes) {
-
-    var commands = [];
-    var lastStroke;
-    strokes.forEach(function(stroke, index, array) {
-        commands = commands.concat(getCommand(stroke, lastStroke));
-        lastStroke = stroke;
+function getStrokeCommands(strokes) {
+    var strokeCommands = [];
+    strokes.forEach((stroke) => {
+        var strokCommand = getStrokeCommand(stroke);       
+        strokeCommands.push(strokCommand);
     });
-    return commands;
+    return strokeCommands;
 }
 
-//one stroke turns into 3 commands
-function getCommand(stroke, lastStroke) {
-    var commands = [];
-
+function getStrokeCommand(stroke, lastStroke) {
+    
     globalLeftAngle = determineBaseAngleFromPosition(stroke, getLeftBaseArm(globalLeftAngle), true);
     globalRightAngle = determineBaseAngleFromPosition(stroke, getRightBaseArm(globalRightAngle), false);
 
-    if(!lastStroke || lastStroke.draw !== stroke.draw) {
-        if(stroke.draw) {
-            commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
-            commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
-            commands.push("i102"); //down
-        } else {
-            commands.push("i90");  //up
-            commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
-            commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
-        }
+    var leftServoCommand = new ServoCommand(Constants.SERVO_ID.LEFT, 180 - Math.floor(globalLeftAngle.degrees));
+    var rightServoCommand = new ServoCommand(Constants.SERVO_ID.RIGHT, 180 - Math.floor(globalRightAngle.degrees));
+    var lifterServoCommand;
+    if(stroke.draw) {
+        lifterServoCommand = new ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.DOWN);
+    } else {
+        lifterServoCommand = new ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.DOWN);
     }
-    
-    return commands;
+    return new StrokeCommand(leftServoCommand, rightServoCommand, lifterServoCommand);    
 }
 
 function determineBaseAngleFromPosition(strokePoint, baseArm, isLeft) {
@@ -131,6 +125,17 @@ function Arm(x, y, angle, length) {
     this.angle = angle;
 }
 
+function StrokeCommand(leftServoCommand, rightServoCommand, lifterServoCommand) {
+    this.leftServoCommand = leftServoCommand;
+    this.rightServoCommand = rightServoCommand;
+    this.lifterServoCommand = lifterServoCommand;
+}
+
+function ServoCommand(servoId, servoPosition) {
+    this.servoId = servoId;
+    this.servoPosition = servoPosition;
+}
+
 module.exports = {
-    getCommands: getCommands
+    getStrokeCommands: getStrokeCommands
 };

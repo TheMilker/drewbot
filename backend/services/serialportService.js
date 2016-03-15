@@ -1,6 +1,7 @@
+var Constants = require('./constants');
 var five = require("johnny-five");
-var repl = true;
-// var repl = false;
+//var repl = true;
+var repl = false;
 var board;
 
 var lifterServo;
@@ -10,7 +11,10 @@ var rightServo;
 connect();
 
 function connect() {
-    board = new five.Board({ repl: repl });
+    board = new five.Board({ 
+        repl: repl,
+        port: "COM3" 
+    });    
     board.on("ready", () => {
         lifterServo = new five.Servo(9);
         leftServo = new five.Servo(10);
@@ -19,11 +23,11 @@ function connect() {
         // board.pinMode(10, five.Pin.SERVO);
         // board.pinMode(11, five.Pin.SERVO);
 
-        board.repl.inject({
-            i: lifterServo,
-            l: leftServo,
-            r: rightServo
-        });
+        // board.repl.inject({
+        //     i: lifterServo,
+        //     l: leftServo,
+        //     r: rightServo
+        // });
     });
     
     board.on("message", function(event) {
@@ -43,43 +47,70 @@ function writeCommand(command) {
     var servoId = command.substring(0,1);
     var servoCommand = parseInt(command.substring(1));
     
-    if(servoId === "l") {
+    if(servoId === Constants.SERVO_ID.LEFT) {
         leftServo.to(servoCommand);
-    } else if(servoId === "r") {
+    } else if(servoId === Constants.SERVO_ID.RIGHT) {
         rightServo.to(servoCommand);
-    } else if(servoId === "i") {
+    } else if(servoId === Constants.SERVO_ID.LIFTER) {
         lifterServo.to(servoCommand);
     }
 }
 
-function writeCommands(commands) {
-    /* jshint ignore:start */
-    for (var i = 0; i < commands.length;) {
-        if(commands[i].indexOf("i") === -1) {
-            (function(i){
-                setTimeout(function() {
-                    var commandL = commands[i];
-                    var commandR = commands[i+1];
-                    writeCommand(commandL);
-                    writeCommand(commandR);
-                }, 20 * i);
-            }(i));
-            i = i+2;
-        } else {
-            (function(i){
-                setTimeout(function() {
-                    var commandI = commands[i];
-                    writeCommand(commandI);
-                }, 20 * i);
-            }(i));
-            i = i+1;
-        }
+function writeServoCommand(servoCommand) {
+    
+    if(servoCommand.servoId === Constants.SERVO_ID.LEFT) {
+        leftServo.to(servoCommand.servoPosition);
+    } else if(servoCommand.servoId === Constants.SERVO_ID.RIGHT) {
+        rightServo.to(servoCommand.servoPosition);
+    } else if(servoCommand.servoId === Constants.SERVO_ID.LIFTER) {
+        lifterServo.to(servoCommand.servoPosition);
     }
-    /* jshint ignore:end */
 }
+
+function writeStrokeCommands(strokeCommands) {
+    var i = 0;
+    var interval = setInterval(function() {
+        var strokeCommand = strokeCommands[i];
+        if(strokeCommand.lifterServoCommand.servoPosition === Constants.SERVO_POSITION.DOWN) {
+            writeServoCommand(strokeCommand.leftServoCommand);
+            writeServoCommand(strokeCommand.rightServoCommand);
+            writeServoCommand(strokeCommand.lifterServoCommand);
+        } else if(strokeCommand.lifterServoCommand.servoPosition === Constants.SERVO_POSITION.UP) {
+            writeServoCommand(strokeCommand.lifterServoCommand);
+            writeServoCommand(strokeCommand.leftServoCommand);
+            writeServoCommand(strokeCommand.rightServoCommand);
+        }
+    }, 20);
+}
+
+// function writeCommands(commands) {
+//     /* jshint ignore:start */
+//     for (var i = 0; i < commands.length;) {
+//         if(commands[i].indexOf("i") === -1) {
+//             (function(i){
+//                 setTimeout(function() {
+//                     var commandL = commands[i];
+//                     var commandR = commands[i+1];
+//                     writeCommand(commandL);
+//                     writeCommand(commandR);
+//                 }, 20 * i);
+//             }(i));
+//             i = i+2;
+//         } else {
+//             (function(i){
+//                 setTimeout(function() {
+//                     var commandI = commands[i];
+//                     writeCommand(commandI);
+//                 }, 20 * i);
+//             }(i));
+//             i = i+1;
+//         }
+//     }
+//     /* jshint ignore:end */
+// }
 
 module.exports = {
     writeCommand: writeCommand,
-    writeCommands: writeCommands,
+    writeStrokeCommands: writeStrokeCommands,
     connect: connect
 };
