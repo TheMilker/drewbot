@@ -9,14 +9,14 @@ var globalRightAngle = new Angle(75, true);
 function getStrokeCommands(strokes) {
     var strokeCommands = [];
     strokes.forEach((stroke) => {
-        var strokCommand = getStrokeCommand(stroke);       
+        var strokCommand = getStrokeCommand(stroke);
         strokeCommands.push(strokCommand);
     });
     return strokeCommands;
 }
 
 function getStrokeCommand(stroke, lastStroke) {
-    
+
     globalLeftAngle = determineBaseAngleFromPosition(stroke, getLeftBaseArm(globalLeftAngle), true);
     globalRightAngle = determineBaseAngleFromPosition(stroke, getRightBaseArm(globalRightAngle), false);
 
@@ -26,9 +26,9 @@ function getStrokeCommand(stroke, lastStroke) {
     if(stroke.draw) {
         lifterServoCommand = new ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.DOWN);
     } else {
-        lifterServoCommand = new ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.DOWN);
+        lifterServoCommand = new ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.UP);
     }
-    return new StrokeCommand(leftServoCommand, rightServoCommand, lifterServoCommand);    
+    return new StrokeCommand(leftServoCommand, rightServoCommand, lifterServoCommand);
 }
 
 function determineBaseAngleFromPosition(strokePoint, baseArm, isLeft) {
