@@ -46,7 +46,7 @@
             var JSONStrokes = JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes);
             drawStrokes(JSONStrokes);
         };
-        
+
         function drawStrokes(JSONStrokes) {
             arduinoService.drawStrokes(JSONStrokes).success((data, status, headers, config) => {
                 fontCreationControlsVM.response = data;

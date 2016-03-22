@@ -6,7 +6,3 @@ exports.getCurrentFormattedTime = () => {
     var formattedTime = hours + ':' + minutes.substr(minutes.length-2) + ':' + seconds.substr(seconds.length-2);
     return formattedTime;
 };
-
-exports.endsWith = (str, suffix) => {
-    return str.indexOf(suffix, str.length - suffix.length) !== -1;
-};

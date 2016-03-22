@@ -43,19 +43,6 @@ function connect() {
     });
 }
 
-function writeCommand(command) {
-    var servoId = command.substring(0,1);
-    var servoCommand = parseInt(command.substring(1));
-
-    if(servoId === Constants.SERVO_ID.LEFT) {
-        leftServo.to(servoCommand);
-    } else if(servoId === Constants.SERVO_ID.RIGHT) {
-        rightServo.to(servoCommand);
-    } else if(servoId === Constants.SERVO_ID.LIFTER) {
-        lifterServo.to(servoCommand);
-    }
-}
-
 function writeServoCommand(servoCommand) {
 
     if(servoCommand.servoId === Constants.SERVO_ID.LEFT) {
@@ -111,7 +98,7 @@ function getServoCommandsArray(strokeCommands) {
 }
 
 module.exports = {
-    writeCommand: writeCommand,
+    writeServoCommand: writeServoCommand,
     writeStrokeCommands: writeStrokeCommands,
     connect: connect
 };

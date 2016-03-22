@@ -5,9 +5,8 @@ var serialportService = require('./../services/serialportService');
 var router = express.Router();
 
 router.post('/', function(req, res) {
-    
+
     serialportService.connect();
-    
     res.send('Connecting arduino... ' + drewbotUtils.getCurrentFormattedTime());
 });
 
