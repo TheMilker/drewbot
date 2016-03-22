@@ -44,7 +44,6 @@ function connect() {
 }
 
 function writeServoCommand(servoCommand) {
-
     if(servoCommand.servoId === Constants.SERVO_ID.LEFT) {
         console.log("l: ", servoCommand.servoPosition);
         //leftServo.to(servoCommand.servoPosition);
@@ -55,11 +54,6 @@ function writeServoCommand(servoCommand) {
         console.log("i: ", servoCommand.servoPosition);
         //lifterServo.to(servoCommand.servoPosition);
     }
-}
-
-function writeStrokeCommands(strokeCommands) {
-    var servoCommands = getServoCommandsArray(strokeCommands);
-    writeServoCommands(servoCommands);
 }
 
 function writeServoCommands(servoCommands) {
@@ -81,25 +75,8 @@ function writeServoCommands(servoCommands) {
     }, 20);
 }
 
-function getServoCommandsArray(strokeCommands) {
-    var servoCommands = [];
-    strokeCommands.forEach(function(strokeCommand) {
-        if(strokeCommand.lifterServoCommand.servoPosition === Constants.SERVO_POSITION.DOWN) {
-            servoCommands.push(strokeCommand.leftServoCommand);
-            servoCommands.push(strokeCommand.rightServoCommand);
-            servoCommands.push(strokeCommand.lifterServoCommand);
-        } else if(strokeCommand.lifterServoCommand.servoPosition === Constants.SERVO_POSITION.UP) {
-            servoCommands.push(strokeCommand.lifterServoCommand);
-            servoCommands.push(strokeCommand.leftServoCommand);
-            servoCommands.push(strokeCommand.rightServoCommand);
-        }
-    });
-    return servoCommands;
-}
-
 module.exports = {
     writeServoCommand: writeServoCommand,
     writeServoCommands: writeServoCommands,
-    writeStrokeCommands: writeStrokeCommands,
     connect: connect
 };
