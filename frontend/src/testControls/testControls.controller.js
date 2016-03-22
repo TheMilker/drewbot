@@ -23,10 +23,14 @@
             servoId: 'i',
             servoPosition: 90
         });
-        TestControlsVM.sendUserCommand = () => sendCommand({
-            servoId: TestControlsVM.customCommand.substring(0,1),
-            servoPosition: parseInt(TestControlsVM.customCommand.substring(1))
-        });
+        TestControlsVM.sendUserCommand = () => {
+            if(TestControlsVM.customCommand && TestControlsVM.customCommand.trim()) {
+                sendCommand({
+                    servoId: TestControlsVM.customCommand.substring(0,1),
+                    servoPosition: parseInt(TestControlsVM.customCommand.substring(1))
+                });
+            }
+        };
 
         TestControlsVM.connectArduino = () => {
             arduinoService.connectArduino().success((data, status, headers, config) => {

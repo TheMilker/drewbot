@@ -28,7 +28,9 @@
 
         fontCreationControlsVM.sendStrokes = () => {
             var JSONStrokes = fontCreationControlsService.getStrokesAsJSONArray();
-            drawStrokes(JSONStrokes);
+            if(JSONStrokes) {
+                drawStrokes(JSONStrokes);
+            }
         };
 
         fontCreationControlsVM.simulateStrokes = () => {
@@ -43,8 +45,10 @@
         };
 
         fontCreationControlsVM.sendFont = () => {
-            var JSONStrokes = JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes);
-            drawStrokes(JSONStrokes);
+            if(fontCreationControlsVM.fontCreationControlsModel.fontStrokes) {
+                var JSONStrokes = JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes);
+                drawStrokes(JSONStrokes);
+            }
         };
 
         function drawStrokes(JSONStrokes) {
@@ -56,7 +60,9 @@
         }
 
         fontCreationControlsVM.simulateFontStrokes = () => {
-            drewbotService.simulateStrokes(JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes));
+            if(fontCreationControlsVM.fontCreationControlsModel.fontStrokes) {
+                drewbotService.simulateStrokes(JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes));
+            }
         };
 
         fontCreationControlsVM.recordingClicked = () => {
