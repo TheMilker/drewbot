@@ -110,32 +110,6 @@ function getServoCommandsArray(strokeCommands) {
     return servoCommands;
 }
 
-// function writeCommands(commands) {
-//     /* jshint ignore:start */
-//     for (var i = 0; i < commands.length;) {
-//         if(commands[i].indexOf("i") === -1) {
-//             (function(i){
-//                 setTimeout(function() {
-//                     var commandL = commands[i];
-//                     var commandR = commands[i+1];
-//                     writeCommand(commandL);
-//                     writeCommand(commandR);
-//                 }, 20 * i);
-//             }(i));
-//             i = i+2;
-//         } else {
-//             (function(i){
-//                 setTimeout(function() {
-//                     var commandI = commands[i];
-//                     writeCommand(commandI);
-//                 }, 20 * i);
-//             }(i));
-//             i = i+1;
-//         }
-//     }
-//     /* jshint ignore:end */
-// }
-
 module.exports = {
     writeCommand: writeCommand,
     writeStrokeCommands: writeStrokeCommands,
