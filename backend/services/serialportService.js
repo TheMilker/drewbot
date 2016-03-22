@@ -99,6 +99,7 @@ function getServoCommandsArray(strokeCommands) {
 
 module.exports = {
     writeServoCommand: writeServoCommand,
+    writeServoCommands: writeServoCommands,
     writeStrokeCommands: writeStrokeCommands,
     connect: connect
 };
