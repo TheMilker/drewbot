@@ -9,6 +9,7 @@ var routes = require('./routes/index');
 var command = require('./routes/command');
 var commands = require('./routes/commands');
 var connectArduino = require('./routes/connectArduino');
+var drawCharacters = require('./routes/drawCharacters');
 var drawStrokes = require('./routes/drawStrokes');
 var fonts = require('./routes/fonts');
 
@@ -30,6 +31,7 @@ app.use('/', routes);
 app.use('/command', command);
 app.use('/commands', commands);
 app.use('/connectArduino', connectArduino);
+app.use('/drawCharacters', drawCharacters);
 app.use('/drawStrokes', drawStrokes);
 app.use('/fonts', fonts);
 

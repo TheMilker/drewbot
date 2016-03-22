@@ -18,8 +18,17 @@
            }
         };
 
-        fontCreationControlsVM.playMessage = () => {
+        fontCreationControlsVM.sendMessage = () => {
+            console.log("send message");
+        };
+
+        fontCreationControlsVM.simulateMessage = () => {
             drewbotService.simulateString(fontCreationControlsVM.fontCreationControlsModel.message);
+        };
+
+        fontCreationControlsVM.sendCurrentTime = () => {
+            console.log("send current time");
+            // drewbotService.sendCurrentTime();
         };
 
         fontCreationControlsVM.simulateCurrentTime = () => {
