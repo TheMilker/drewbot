@@ -11,10 +11,26 @@
         TestControlsVM.testControlsModel = testControlsService.getTestControlsModel();
         TestControlsVM.clearCommands = testControlsService.clearCommands;
 
-        TestControlsVM.left90 = () => sendCommand("l90\n");
-        TestControlsVM.right90 = () => sendCommand("r90\n");
-        TestControlsVM.lifter90 = () => sendCommand("i90\n");
-        TestControlsVM.sendUserCommand = () => sendCommand(TestControlsVM.customCommand);
+        TestControlsVM.left90 = () => sendCommand({
+            servoId: 'l',
+            servoPosition: 90
+        });
+        TestControlsVM.right90 = () => sendCommand({
+            servoId: 'r',
+            servoPosition: 90
+        });
+        TestControlsVM.lifter90 = () => sendCommand({
+            servoId: 'i',
+            servoPosition: 90
+        });
+        TestControlsVM.sendUserCommand = () => {
+            if(TestControlsVM.customCommand && TestControlsVM.customCommand.trim()) {
+                sendCommand({
+                    servoId: TestControlsVM.customCommand.substring(0,1),
+                    servoPosition: parseInt(TestControlsVM.customCommand.substring(1))
+                });
+            }
+        };
 
         TestControlsVM.connectArduino = () => {
             arduinoService.connectArduino().success((data, status, headers, config) => {
@@ -41,6 +57,6 @@
             });
         };
 
-        
+
     }
 })();

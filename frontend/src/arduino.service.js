@@ -27,6 +27,11 @@
             return $http.post('/drawStrokes', {strokes: JSONStrokes});
         };
 
+        instance.sendMessage = (message) => {
+            console.log("sendMessage: ", message);
+            return $http.post('/drawCharacters', {message: message});
+        };
+
         return instance;
     }
 })();

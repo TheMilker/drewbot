@@ -48,14 +48,14 @@
             if (isNaN(positionPoint.x) || isNaN(positionPoint.y)) {
                 return;
             }
-            
+
             updateGlobalAnglePositions(positionPoint, drewbotEngineService.getLeftBaseArm(globalLeftAngle), drewbotEngineService.getRightBaseArm(globalRightAngle));
             appendCommands(globalLeftAngle, globalRightAngle, positionStroke.draw);
             fontCreationControlsService.appendStroke(positionStroke);
 
             instance.update();
         }
-        
+
         instance.update = () => {
             drewbotCanvasService.clearCanvas();
             draw();
@@ -68,7 +68,7 @@
         }
 
         function positionOfConnection(point1, p1Length, point2, p2Length) {
-            var intersectionPoints = drewbotEngineService.circleIntersectionPoints(point1, p1Length, point2, p2Length);            
+            var intersectionPoints = drewbotEngineService.circleIntersectionPoints(point1, p1Length, point2, p2Length);
 
             // Use max y - it should never buckle down
             var connectionPoint;
@@ -81,13 +81,13 @@
             return connectionPoint;
         }
 
-        function draw() {            
+        function draw() {
             var baseLeft = drewbotEngineService.getLeftBaseArm(globalLeftAngle);
-            var baseRight = drewbotEngineService.getRightBaseArm(globalRightAngle);           
-            
+            var baseRight = drewbotEngineService.getRightBaseArm(globalRightAngle);
+
             // Add box for char size
             drewbotCanvasService.drawCharOutline({ "x": baseLeft.point.x, "y": simulatorConstants.ARM_LENGTH * 0.9 }, simulatorConstants.ARM_LENGTH * 0.5, simulatorConstants.ARM_LENGTH * 0.5);
-            
+
             drawArms(baseLeft, baseRight);
 
             // If we're in drawing mode, draw the current set of points
@@ -97,27 +97,27 @@
             drewbotCanvasService.addTextAtPosition("  Left(" + Math.floor(baseLeft.angle.degrees) + "\u00B0)", baseLeft.point);
             drewbotCanvasService.addTextAtPosition("  Right(" + Math.floor(baseRight.angle.degrees) + "\u00B0)", baseRight.point);
         }
-        
+
         function playbackStep(playBackInfo) {
             if(playBackInfo.strokes.length === 0) return;
             var stroke = playBackInfo.strokes[playBackInfo.playBackIndex++];
             playBackInfo.playBackStrokePoints.push(stroke);
-            
+
             drewbotCanvasService.clearCanvas();
-                        
+
             var baseLeft = drewbotEngineService.getLeftBaseArm(globalLeftAngle);
-            var baseRight = drewbotEngineService.getRightBaseArm(globalRightAngle);            
-            
+            var baseRight = drewbotEngineService.getRightBaseArm(globalRightAngle);
+
             drawArms(baseLeft, baseRight);
-            
+
             //record the arduino commands to the textarea
             updateGlobalAnglePositions(stroke.point, baseLeft, baseRight);
             appendCommands(globalLeftAngle, globalRightAngle, stroke.draw);
-            
+
             //draw strokes
             drewbotCanvasService.applyStrokes(playBackInfo.playBackStrokePoints);
         }
-        
+
         function drawArms(baseLeft, baseRight) {
             var leftEndPoint = servoEndPoint(baseLeft);
             var rightEndPoint = servoEndPoint(baseRight);
@@ -129,15 +129,15 @@
             // Draw top arms.
             drewbotCanvasService.drawLine(leftEndPoint, connectionPoint, "#0000ff");
             drewbotCanvasService.drawLine(rightEndPoint, connectionPoint, "#ff0000");
-            // show coordinates at the connection point            
+            // show coordinates at the connection point
             drewbotCanvasService.addTextAtPosition("  (" + Math.floor(connectionPoint.x) + "," + Math.floor(connectionPoint.y) + ")", connectionPoint);
         }
-        
+
         function updateGlobalAnglePositions(point, leftAngle, rightAngle) {
             globalLeftAngle = drewbotEngineService.determineBaseAngleFromPosition(point, leftAngle, true);
             globalRightAngle = drewbotEngineService.determineBaseAngleFromPosition(point, rightAngle, false);
         }
-        
+
         function playBack(strokes) {
             instance.clearStrokePoints();
             var playBackInfo = {
@@ -154,7 +154,7 @@
                     strokes: strokes
                 };
             });
-        }    
+        }
 
         instance.simulateStrokes = (strokes) => {
             testControlsService.clearCommands();
@@ -168,21 +168,21 @@
         instance.simulateCurrentTime = () => {
             testControlsService.clearCommands();
             instance.simulateStrokes(strokeService.getTimeAsStrokes());
-        };       
+        };
 
         instance.simulateString = (str) => {
             testControlsService.clearCommands();
             instance.simulateStrokes(strokeService.convertToStrokes(str));
         };
-        
+
         function appendCommands(leftAngle, rightAngle, shouldDraw) {
             if(shouldDraw) {
                 testControlsService.appendCommand("i102");
             } else {
                 testControlsService.appendCommand("i90");
             }
-            testControlsService.appendCommand("L" + (180 - Math.floor(leftAngle.degrees)));
-            testControlsService.appendCommand("R" + (180 - Math.floor(rightAngle.degrees)));
+            testControlsService.appendCommand("l" + (180 - Math.floor(leftAngle.degrees)));
+            testControlsService.appendCommand("r" + (180 - Math.floor(rightAngle.degrees)));
         }
 
         return instance;

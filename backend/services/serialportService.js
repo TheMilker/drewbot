@@ -1,64 +1,82 @@
-var serialPort = require('serialport');
+var Constants = require('./constants');
+var five = require("johnny-five");
+//var repl = true;
+var repl = false;
+var board;
 
-var port;
+var lifterServo;
+var leftServo;
+var rightServo;
 
-connect();
+//connect();
 
 function connect() {
-    serialPort.list(function(err, ports) {
-        if(ports) {
-            console.log("Opening serial port: ", ports.slice(-1)[0].comName);
-            port = new serialPort.SerialPort(ports.slice(-1)[0].comName, null, false);
-            port.open(function(err) {
-                if(err) {
-                    console.log("on open err: ", err);
-                } else {
-                    console.log("serial port opened successfully!");
-                }
-            });
-        } else {
-            console.log("No devices found on serial ports.");
-        }
+    board = new five.Board({
+        repl: repl,
+        //port: "COM3"
+    });
+    board.on("ready", () => {
+        lifterServo = new five.Servo(9);
+        leftServo = new five.Servo(10);
+        rightServo = new five.Servo(11);
+        // board.pinMode(9, five.Pin.SERVO);
+        // board.pinMode(10, five.Pin.SERVO);
+        // board.pinMode(11, five.Pin.SERVO);
+
+        // board.repl.inject({
+        //     i: lifterServo,
+        //     l: leftServo,
+        //     r: rightServo
+        // });
+    });
+
+    board.on("message", function(event) {
+        /*
+            Event {
+                type: "info"|"warn"|"fail",
+                timestamp: Time of event in milliseconds,
+                class: name of relevant component class,
+                message: message [+ ...detail]
+            }
+        */
+        console.log("Received a %s message, from %s, reporting: %s", event.type, event.class, event.message);
     });
 }
 
-function writeCommand(command) {
-    port.write(command, function(err, results) {
-        if(err) {
-           console.log('err ' + err);
-        }
-        console.log('results ' + results);
-    });
-}
-
-function writeCommands(commands) {
-    /* jshint ignore:start */
-    for (var i = 0; i < commands.length;) {
-        if(commands[i].indexOf("i") === -1) {
-            (function(i){
-                setTimeout(function() {
-                    var commandL = commands[i] + "\n";
-                    var commandR = commands[i+1] + "\n";
-                    writeCommand(commandL);
-                    writeCommand(commandR);
-                }, 20 * i);
-            }(i));
-            i = i+2;
-        } else {
-            (function(i){
-                setTimeout(function() {
-                    var commandI = commands[i] + "\n";
-                    writeCommand(commandI);
-                }, 20 * i);
-            }(i));
-            i = i+1;
-        }
+function writeServoCommand(servoCommand) {
+    if(servoCommand.servoId === Constants.SERVO_ID.LEFT) {
+        console.log("l: ", servoCommand.servoPosition);
+        leftServo.to(servoCommand.servoPosition);
+    } else if(servoCommand.servoId === Constants.SERVO_ID.RIGHT) {
+        console.log("r: ", servoCommand.servoPosition);
+        rightServo.to(servoCommand.servoPosition);
+    } else if(servoCommand.servoId === Constants.SERVO_ID.LIFTER) {
+        console.log("i: ", servoCommand.servoPosition);
+        lifterServo.to(servoCommand.servoPosition);
     }
-    /* jshint ignore:end */
+}
+
+function writeServoCommands(servoCommands) {
+    console.log("commands to send: ", servoCommands.length);
+    var i = 0;
+    var interval = setInterval(function() {
+        var servoCommand = servoCommands[i];
+        if(servoCommand.servoId === Constants.SERVO_ID.LIFTER) {
+            writeServoCommand(servoCommands[i]);
+            i = i+1;
+        } else if(servoCommand.servoId === Constants.SERVO_ID.LEFT) {
+            writeServoCommand(servoCommands[i]);
+            writeServoCommand(servoCommands[i+1]);
+            i = i+2;
+        }
+        if(i > servoCommands.length-1) {
+            clearInterval(interval);
+        }
+    }, 20);
 }
 
 module.exports = {
-    writeCommand: writeCommand,
-    writeCommands: writeCommands,
+    writeServoCommand: writeServoCommand,
+    writeServoCommands: writeServoCommands,
     connect: connect
 };

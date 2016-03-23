@@ -18,8 +18,21 @@
            }
         };
 
-        fontCreationControlsVM.playMessage = () => {
+        fontCreationControlsVM.sendMessage = () => {
+            arduinoService.sendMessage(fontCreationControlsVM.fontCreationControlsModel.message).success((data, status, headers, config) => {
+                fontCreationControlsVM.response = data;
+            }).error((data, status, headers, config) => {
+                fontCreationControlsVM.response = data;
+            });
+        };
+
+        fontCreationControlsVM.simulateMessage = () => {
             drewbotService.simulateString(fontCreationControlsVM.fontCreationControlsModel.message);
+        };
+
+        fontCreationControlsVM.sendCurrentTime = () => {
+            console.log("send current time");
+            // drewbotService.sendCurrentTime();
         };
 
         fontCreationControlsVM.simulateCurrentTime = () => {
@@ -28,7 +41,9 @@
 
         fontCreationControlsVM.sendStrokes = () => {
             var JSONStrokes = fontCreationControlsService.getStrokesAsJSONArray();
-            drawStrokes(JSONStrokes);
+            if(JSONStrokes) {
+                drawStrokes(JSONStrokes);
+            }
         };
 
         fontCreationControlsVM.simulateStrokes = () => {
@@ -43,10 +58,12 @@
         };
 
         fontCreationControlsVM.sendFont = () => {
-            var JSONStrokes = JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes);
-            drawStrokes(JSONStrokes);
+            if(fontCreationControlsVM.fontCreationControlsModel.fontStrokes) {
+                var JSONStrokes = JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes);
+                drawStrokes(JSONStrokes);
+            }
         };
-        
+
         function drawStrokes(JSONStrokes) {
             arduinoService.drawStrokes(JSONStrokes).success((data, status, headers, config) => {
                 fontCreationControlsVM.response = data;
@@ -56,7 +73,9 @@
         }
 
         fontCreationControlsVM.simulateFontStrokes = () => {
-            drewbotService.simulateStrokes(JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes));
+            if(fontCreationControlsVM.fontCreationControlsModel.fontStrokes) {
+                drewbotService.simulateStrokes(JSON.parse(fontCreationControlsVM.fontCreationControlsModel.fontStrokes));
+            }
         };
 
         fontCreationControlsVM.recordingClicked = () => {

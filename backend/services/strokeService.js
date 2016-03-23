@@ -1,45 +1,76 @@
-var ARM_LENGTH_MM = 50;
-var CANVAS_SCALE_FACTOR = 4;
-var ARM_LENGTH = ARM_LENGTH_MM * CANVAS_SCALE_FACTOR;
-var globalLeftAngle = new Angle(125, true);
-var globalRightAngle = new Angle(75, true);
+const Constants = require('./constants');
+const ServoCommandFactory = require('./classes/ServoCommandFactory');
+const StrokeCommandFactory = require('./classes/StrokeCommandFactory');
+const AngleFactory = require('./classes/AngleFactory');
+const ArmFactory = require('./classes/ArmFactory');
+const PointFactory = require('./classes/PointFactory');
+const FontService = require('./fonts/fontService');
+const _und = require('underscore');
 
-function getCommands(strokes) {
+var globalLeftAngle = AngleFactory.Angle(125, true);
+var globalRightAngle = AngleFactory.Angle(75, true);
+var fonts = FontService.getFonts();
 
-    var commands = [];
-    var lastStroke;
-    strokes.forEach(function(stroke, index, array) {
-        commands = commands.concat(getCommand(stroke, lastStroke));
-        lastStroke = stroke;
-    });
-    return commands;
+function getStrokeCommandsFromString(str) {
+    var offsetX = Constants.FIRST_CHAR_X;
+    var strokes = [];
+
+    if(fonts && fonts.erik) {
+        var font = fonts.erik;
+
+        _und.each(str, (currentCharacter, index) => {
+            var characterStrokes = font[currentCharacter.toString()];
+            strokes.push({
+                x: characterStrokes[0].x + offsetX,
+                y: characterStrokes[0].y,
+                draw: false
+            });
+            _und.each(characterStrokes, (strokeData) => {
+                strokes.push({
+                    x: strokeData.x + offsetX,
+                    y: strokeData.y,
+                    draw: strokeData.draw
+                });
+            });
+            strokes.push({
+                x: currentCharacter[currentCharacter.length-1].x + offsetX,
+                y: currentCharacter[currentCharacter.length-1].y,
+                draw: false
+            });
+            offsetX += Constants.DIGIT_OFFSET;
+        });
+    }
+    return getStrokeCommands(strokes);
 }
 
-//one stroke turns into 3 commands
-function getCommand(stroke, lastStroke) {
-    var commands = [];
+function getStrokeCommands(strokes) {
+    var strokeCommands = [];
+    strokes.forEach((stroke) => {
+        var strokeCommand = getStrokeCommand(stroke);
+        strokeCommands.push(strokeCommand);
+    });
+    return strokeCommands;
+}
+
+function getStrokeCommand(stroke) {
 
     globalLeftAngle = determineBaseAngleFromPosition(stroke, getLeftBaseArm(globalLeftAngle), true);
     globalRightAngle = determineBaseAngleFromPosition(stroke, getRightBaseArm(globalRightAngle), false);
 
-    if(!lastStroke || lastStroke.draw !== stroke.draw) {
-        if(stroke.draw) {
-            commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
-            commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
-            commands.push("i102"); //down
-        } else {
-            commands.push("i90");  //up
-            commands.push("l" + (180 - Math.floor(globalLeftAngle.degrees)));
-            commands.push("r" + (180 - Math.floor(globalRightAngle.degrees)));
-        }
+    var leftServoCommand = ServoCommandFactory.ServoCommand(Constants.SERVO_ID.LEFT, 180 - Math.floor(globalLeftAngle.degrees));
+    var rightServoCommand = ServoCommandFactory.ServoCommand(Constants.SERVO_ID.RIGHT, 180 - Math.floor(globalRightAngle.degrees));
+    var lifterServoCommand;
+    if(stroke.draw) {
+        lifterServoCommand = ServoCommandFactory.ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.DOWN);
+    } else {
+        lifterServoCommand = ServoCommandFactory.ServoCommand(Constants.SERVO_ID.LIFTER, Constants.SERVO_POSITION.UP);
     }
-    
-    return commands;
+    return StrokeCommandFactory.StrokeCommand(leftServoCommand, rightServoCommand, lifterServoCommand);
 }
 
 function determineBaseAngleFromPosition(strokePoint, baseArm, isLeft) {
 
-    var points = circleIntersectionPoints(baseArm.point, baseArm.length, strokePoint, ARM_LENGTH);
+    var points = circleIntersectionPoints(baseArm.point, baseArm.length, strokePoint, Constants.ARM_LENGTH);
     // Use the correct intersection point
     var x;
     var y;
@@ -58,9 +89,9 @@ function determineBaseAngleFromPosition(strokePoint, baseArm, isLeft) {
 
     var result;
     if (x <= baseArm.point.x) {
-        result = new Angle(Math.PI - Math.asin(y / baseArm.length), false);
+        result = AngleFactory.Angle(Math.PI - Math.asin(y / baseArm.length), false);
     } else {
-        result = new Angle(Math.asin(y / baseArm.length), false);
+        result = AngleFactory.Angle(Math.asin(y / baseArm.length), false);
     }
     return result;
 }
@@ -70,7 +101,7 @@ function circleIntersectionPoints(p1, p1Length, p2, p2Length) {
     // Stolen from:
     // http://ambrsoft.com/TrigoCalc/Circles2/Circle2.htm
 
-    var connectionPoints = new Array(2);
+
     var a = p1.x;
     var b = p1.y;
     var c = p2.x;
@@ -88,49 +119,22 @@ function circleIntersectionPoints(p1, p1Length, p2, p2Length) {
     var y1 = yBase - 2 * (c - a) * delta / (D * D);
     var y2 = yBase + 2 * (c - a) * delta / (D * D);
 
-    connectionPoints[0] = new Point(x1, y1);
-    connectionPoints[1] = new Point(x2, y2);
+    var connectionPoints = [];
+    connectionPoints[0] = PointFactory.Point(x1, y1);
+    connectionPoints[1] = PointFactory.Point(x2, y2);
 
     return connectionPoints;
 }
 
 function getLeftBaseArm(angle) {
-    return new Arm(ARM_LENGTH * 2, 0, angle, ARM_LENGTH);
+    return ArmFactory.Arm(Constants.ARM_LENGTH * 2, 0, angle, Constants.ARM_LENGTH);
 }
 
 function getRightBaseArm(angle) {
-    return new Arm(ARM_LENGTH * 2 + CANVAS_SCALE_FACTOR * 20, 0, angle, ARM_LENGTH);
-}
-
-function deg2Rad(angle) {
-    return angle * (Math.PI / 180.0);
-}
-
-function rad2Deg(angle) {
-   return angle * (180.0 / Math.PI);
-}
-
-function Point(x, y) {
-   this.x = x;
-   this.y = y;
-}
-
-function Angle(value, isDegrees) {
-    if (isDegrees) {
-        this.degrees = value;
-        this.radians = deg2Rad(value);
-    } else {
-        this.radians = value;
-        this.degrees = rad2Deg(value);
-    }
-}
-
-function Arm(x, y, angle, length) {
-    this.point = new Point(x, y);
-    this.length = length;
-    this.angle = angle;
+    return ArmFactory.Arm(Constants.ARM_LENGTH * 2 + Constants.CANVAS_SCALE_FACTOR * 20, 0, angle, Constants.ARM_LENGTH);
 }
 
 module.exports = {
-    getCommands: getCommands
+    getStrokeCommands: getStrokeCommands,
+    getStrokeCommandsFromString: getStrokeCommandsFromString
 };

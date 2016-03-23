@@ -1,8 +1,14 @@
 <div>
-    <div>
-        <button ng-click="fontCreationControlsVM.simulateCurrentTime()">What time is it?</button>
-       	<input id="message" placeholder="Type characters here and test font." ng-keypress="fontCreationControlsVM.messageKeypress($event)" ng-model="fontCreationControlsVM.fontCreationControlsModel.message"></input>
-    	<button ng-click="fontCreationControlsVM.playMessage()">Test Font!</button>
+    <div id="fontTestContainer">
+        <div id="time">
+            <button ng-click="fontCreationControlsVM.sendCurrentTime()">Send time</button>
+            <button ng-click="fontCreationControlsVM.simulateCurrentTime()">Simulate time!</button>
+        </div>
+        <div id="message">
+            <input id="message" placeholder="Type characters here and test font." ng-keypress="fontCreationControlsVM.messageKeypress($event)" ng-model="fontCreationControlsVM.fontCreationControlsModel.message"></input>
+            <button ng-click="fontCreationControlsVM.sendMessage()">Send Message</button>
+            <button ng-click="fontCreationControlsVM.simulateMessage()">Simulate Message!</button>
+        </div>
     </div>
     <div id="strokesContainer">
         <div>
