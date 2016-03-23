@@ -46,13 +46,13 @@ function connect() {
 function writeServoCommand(servoCommand) {
     if(servoCommand.servoId === Constants.SERVO_ID.LEFT) {
         console.log("l: ", servoCommand.servoPosition);
-        //leftServo.to(servoCommand.servoPosition);
+        leftServo.to(servoCommand.servoPosition);
     } else if(servoCommand.servoId === Constants.SERVO_ID.RIGHT) {
         console.log("r: ", servoCommand.servoPosition);
-        //rightServo.to(servoCommand.servoPosition);
+        rightServo.to(servoCommand.servoPosition);
     } else if(servoCommand.servoId === Constants.SERVO_ID.LIFTER) {
         console.log("i: ", servoCommand.servoPosition);
-        //lifterServo.to(servoCommand.servoPosition);
+        lifterServo.to(servoCommand.servoPosition);
     }
 }
 

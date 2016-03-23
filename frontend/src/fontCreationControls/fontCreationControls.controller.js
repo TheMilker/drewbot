@@ -19,7 +19,11 @@
         };
 
         fontCreationControlsVM.sendMessage = () => {
-            console.log("send message");
+            arduinoService.sendMessage(fontCreationControlsVM.fontCreationControlsModel.message).success((data, status, headers, config) => {
+                fontCreationControlsVM.response = data;
+            }).error((data, status, headers, config) => {
+                fontCreationControlsVM.response = data;
+            });
         };
 
         fontCreationControlsVM.simulateMessage = () => {

@@ -8,11 +8,11 @@ var router = express.Router();
 
 router.post('/', function(req, res) {
 
-    // var strokeCommands = StrokeService.getStrokeCommands(req.body.strokes);
-    // var servoCommands = ServoCommandService.getServoCommands(strokeCommands); //TODO fuse these services?
-    // SerialportService.writeServoCommands(servoCommands);
+    var strokeCommands = StrokeService.getStrokeCommandsFromString(req.body.message);
+    var servoCommands = ServoCommandService.getServoCommands(strokeCommands);
+    SerialportService.writeServoCommands(servoCommands);
 
-    // res.send('Drawing Strokes... ' + DrewbotUtils.getCurrentFormattedTime());
+    res.send('Drawing message... ' + DrewbotUtils.getCurrentFormattedTime());
 });
 
 module.exports = router;

@@ -4,20 +4,55 @@ const StrokeCommandFactory = require('./classes/StrokeCommandFactory');
 const AngleFactory = require('./classes/AngleFactory');
 const ArmFactory = require('./classes/ArmFactory');
 const PointFactory = require('./classes/PointFactory');
+const FontService = require('./fonts/fontService');
+const _und = require('underscore');
 
 var globalLeftAngle = AngleFactory.Angle(125, true);
 var globalRightAngle = AngleFactory.Angle(75, true);
+var fonts = FontService.getFonts();
+
+function getStrokeCommandsFromString(str) {
+    var offsetX = Constants.FIRST_CHAR_X;
+    var strokes = [];
+
+    if(fonts && fonts.erik) {
+        var font = fonts.erik;
+
+        _und.each(str, (currentCharacter, index) => {
+            var characterStrokes = font[currentCharacter.toString()];
+            strokes.push({
+                x: characterStrokes[0].x + offsetX,
+                y: characterStrokes[0].y,
+                draw: false
+            });
+            _und.each(characterStrokes, (strokeData) => {
+                strokes.push({
+                    x: strokeData.x + offsetX,
+                    y: strokeData.y,
+                    draw: strokeData.draw
+                });
+            });
+            strokes.push({
+                x: currentCharacter[currentCharacter.length-1].x + offsetX,
+                y: currentCharacter[currentCharacter.length-1].y,
+                draw: false
+            });
+            offsetX += Constants.DIGIT_OFFSET;
+        });
+    }
+    return getStrokeCommands(strokes);
+}
 
 function getStrokeCommands(strokes) {
     var strokeCommands = [];
     strokes.forEach((stroke) => {
-        var strokCommand = getStrokeCommand(stroke);
-        strokeCommands.push(strokCommand);
+        var strokeCommand = getStrokeCommand(stroke);
+        strokeCommands.push(strokeCommand);
     });
     return strokeCommands;
 }
 
-function getStrokeCommand(stroke, lastStroke) {
+function getStrokeCommand(stroke) {
 
     globalLeftAngle = determineBaseAngleFromPosition(stroke, getLeftBaseArm(globalLeftAngle), true);
     globalRightAngle = determineBaseAngleFromPosition(stroke, getRightBaseArm(globalRightAngle), false);
@@ -66,7 +101,7 @@ function circleIntersectionPoints(p1, p1Length, p2, p2Length) {
     // Stolen from:
     // http://ambrsoft.com/TrigoCalc/Circles2/Circle2.htm
 
-    
+
     var a = p1.x;
     var b = p1.y;
     var c = p2.x;
@@ -83,7 +118,7 @@ function circleIntersectionPoints(p1, p1Length, p2, p2Length) {
     var x2 = xBase - 2 * (d - b) * delta / (D * D);
     var y1 = yBase - 2 * (c - a) * delta / (D * D);
     var y2 = yBase + 2 * (c - a) * delta / (D * D);
-    
+
     var connectionPoints = [];
     connectionPoints[0] = PointFactory.Point(x1, y1);
     connectionPoints[1] = PointFactory.Point(x2, y2);
@@ -100,5 +135,6 @@ function getRightBaseArm(angle) {
 }
 
 module.exports = {
-    getStrokeCommands: getStrokeCommands
+    getStrokeCommands: getStrokeCommands,
+    getStrokeCommandsFromString: getStrokeCommandsFromString
 };
